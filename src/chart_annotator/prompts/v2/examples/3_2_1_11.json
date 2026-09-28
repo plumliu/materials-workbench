@@ -1,0 +1,163 @@
+{
+  "figure_id": "3.2.1.11",
+  "tasks": [
+    "datasets",
+    "datasets-repair"
+  ],
+  "image": "dataset_3_2_1_11.png",
+  "source_ids": [
+    "sha256:3675af30fe206266dfd73f98191f3f9982db3d0455878d64abc8540daffc5fd1"
+  ],
+  "selection_cues": [
+    "Average Value",
+    "Spread of Value",
+    "Number of castings"
+  ],
+  "lesson": "Four independent y mappings, each with one complete upper/average/lower point group and one separate solid trend curve. Eight datasets, not sixteen. Group names are exact ordered members, not dataset names.",
+  "input": {
+    "visible_text": [
+      "Aging Temperature",
+      "Ftu",
+      "Fty",
+      "RA",
+      "e(1 in)"
+    ]
+  },
+  "output": {
+    "axes": [
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_11_axis_0",
+        "display_name": "Aging Temperature (F) - Ftu (ksi)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Aging Temperature",
+        "y_label": "Ftu",
+        "x_unit": "F",
+        "y_unit": "ksi",
+        "categories": [],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_11_axis_1",
+        "display_name": "Aging Temperature (F) - Fty (ksi)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Aging Temperature",
+        "y_label": "Fty",
+        "x_unit": "F",
+        "y_unit": "ksi",
+        "categories": [],
+        "shared_x_axis_id": "ex_3_2_1_11_axis_0",
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_11_axis_2",
+        "display_name": "Aging Temperature (F) - RA (Percent)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Aging Temperature",
+        "y_label": "RA",
+        "x_unit": "F",
+        "y_unit": "Percent",
+        "categories": [],
+        "shared_x_axis_id": "ex_3_2_1_11_axis_0",
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_11_axis_3",
+        "display_name": "Aging Temperature (F) - e(1 in) (Percent)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Aging Temperature",
+        "y_label": "e(1 in)",
+        "x_unit": "F",
+        "y_unit": "Percent",
+        "categories": [],
+        "shared_x_axis_id": "ex_3_2_1_11_axis_0",
+        "calibration": {}
+      }
+    ],
+    "datasets": [
+      {
+        "axis_id": "ex_3_2_1_11_axis_0",
+        "display_name": "Ftu Average Value + Spread of Value",
+        "kind": "point_group"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_0",
+        "display_name": "Ftu | solid trend curve",
+        "kind": "curve"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_1",
+        "display_name": "Fty Average Value + Spread of Value",
+        "kind": "point_group"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_1",
+        "display_name": "Fty | solid trend curve",
+        "kind": "curve"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_2",
+        "display_name": "RA Average Value + Spread of Value",
+        "kind": "point_group"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_2",
+        "display_name": "RA | solid trend curve",
+        "kind": "curve"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_3",
+        "display_name": "e(1 in) Average Value + Spread of Value",
+        "kind": "point_group"
+      },
+      {
+        "axis_id": "ex_3_2_1_11_axis_3",
+        "display_name": "e(1 in) | solid trend curve",
+        "kind": "curve"
+      }
+    ]
+  },
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Aging Temperature (F)",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "Ftu (ksi)",
+            "scale": "linear"
+          },
+          {
+            "name": "Fty (ksi)",
+            "scale": "linear"
+          },
+          {
+            "name": "RA (Percent)",
+            "scale": "linear"
+          },
+          {
+            "name": "e(1 in) (Percent)",
+            "scale": "linear"
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "axis_lesson": "One shared linear Aging Temperature (F) X. Four separate linear Y mappings are printed for Ftu, Fty, RA, and e(1 in); error bars and curves do not change the Axis structure."
+}

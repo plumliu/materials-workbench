@@ -1,0 +1,147 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:3fce40e0f62ce93d856bebd9fb51aeb076617bd8a92167e5d8209652f86e69f4",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 12,
+    "figure_id": "3.2.1.19",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "Property - Strength (ksi)",
+      "axis_type": "categorical_x_numeric_y",
+      "x_scale": "categorical",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [
+        "Ftu",
+        "Fty"
+      ],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "Property - Ductility (percent)",
+      "axis_type": "categorical_x_numeric_y",
+      "x_scale": "categorical",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [
+        "RA",
+        "e"
+      ],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "1550F CA | Strength (ksi)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "1810F STA | Strength (ksi)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_1",
+      "display_name": "1860F STA | Strength (ksi)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_1",
+      "display_name": "1800F CYCLIC | Strength (ksi)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_1",
+      "display_name": "Wrought CA | Strength (ksi)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_2",
+      "display_name": "1550F CA | Ductility (percent)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_7",
+      "axis_id": "axis_2",
+      "display_name": "1810F STA | Ductility (percent)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_8",
+      "axis_id": "axis_2",
+      "display_name": "1860F STA | Ductility (percent)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_9",
+      "axis_id": "axis_2",
+      "display_name": "1800F CYCLIC | Ductility (percent)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_10",
+      "axis_id": "axis_2",
+      "display_name": "Wrought CA | Ductility (percent)",
+      "kind": "bar",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

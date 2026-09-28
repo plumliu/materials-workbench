@@ -1,0 +1,159 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.2.1.6",
+  "source_tar_sha256": "e32db67a174eed08a4d0740437e0815bef4794426f5178b5e387f5b289a0e091",
+  "axis_count": 4,
+  "dataset_count": 4,
+  "known_difficulty": "Four filled distributions; retain only distribution boundaries.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "Frequency (percent) - Fty (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 125.31452750352608,
+          "py": 704.8942172073342,
+          "dx": "0",
+          "dy": "115",
+          "dz": null
+        },
+        {
+          "px": 462.09732016925244,
+          "py": 702.2834978843441,
+          "dx": "40",
+          "dy": "115",
+          "dz": null
+        },
+        {
+          "px": 124.00916784203102,
+          "py": 670.9548660084627,
+          "dx": "0",
+          "dy": "115",
+          "dz": null
+        },
+        {
+          "px": 125.31452750352608,
+          "py": 73.10014104372355,
+          "dx": "40",
+          "dy": "155",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Frequency (percent) - Ftu (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 639.6262341325811,
+          "py": 702.2834978843441,
+          "dx": "0",
+          "dy": "125",
+          "dz": null
+        },
+        {
+          "px": 977.7143864598027,
+          "py": 702.2834978843441,
+          "dx": "40",
+          "dy": "125",
+          "dz": null
+        },
+        {
+          "px": 639.6262341325811,
+          "py": 519.5331452750353,
+          "dx": "0",
+          "dy": "125",
+          "dz": null
+        },
+        {
+          "px": 639.6262341325811,
+          "py": 86.15373765867419,
+          "dx": "40",
+          "dy": "155",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Frequency (percent) - RA (percent)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 122.70380818053596,
+          "py": 1571.6530324400562,
+          "dx": "0",
+          "dy": "6",
+          "dz": null
+        },
+        {
+          "px": 516.922425952045,
+          "py": 1571.6530324400562,
+          "dx": "50",
+          "dy": "6",
+          "dz": null
+        },
+        {
+          "px": 122.70380818053596,
+          "py": 1477.6671368124119,
+          "dx": "0",
+          "dy": "6",
+          "dz": null
+        },
+        {
+          "px": 122.70380818053596,
+          "py": 1101.7235543018335,
+          "dx": "50",
+          "dy": "22",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Frequency (percent) - e (percent)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 639.6262341325811,
+          "py": 1571.6530324400562,
+          "dx": "0",
+          "dy": "10",
+          "dz": null
+        },
+        {
+          "px": 955.5232722143863,
+          "py": 1571.6530324400562,
+          "dx": "40",
+          "dy": "10",
+          "dz": null
+        },
+        {
+          "px": 639.6262341325811,
+          "py": 1383.6812411847673,
+          "dx": "0",
+          "dy": "10",
+          "dz": null
+        },
+        {
+          "px": 639.6262341325811,
+          "py": 913.7517630465444,
+          "dx": "40",
+          "dy": "30",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

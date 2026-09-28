@@ -1,0 +1,225 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:02c00423b4c56b1c2ce27ae34e6ac73d56d6f5c86ea48b7fb5a47d01b14ec7ec",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 9,
+    "figure_id": "3.2.1.10",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "Aging Temperature - F - Ftu (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "Aging Temperature - F - Fty (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_3",
+      "display_name": "Aging Temperature - F - RA (Percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_4",
+      "display_name": "Aging Temperature - F - e(1 in.) (Percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | 1750F, 1 hr, WQ + age, 8 hrs, AC | open circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | 1750F, 1 hr, WQ + age, 8 hrs, AC | dashed trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | 1850F, 1 hr, WQ + age, 8 hrs, AC | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | 1850F, 1 hr, WQ + age, 8 hrs, AC | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_2",
+      "display_name": "Fty | 1750F, 1 hr, WQ + age, 8 hrs, AC | open square",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_2",
+      "display_name": "Fty | 1750F, 1 hr, WQ + age, 8 hrs, AC | dashed trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_7",
+      "axis_id": "axis_2",
+      "display_name": "Fty | 1850F, 1 hr, WQ + age, 8 hrs, AC | filled square",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_8",
+      "axis_id": "axis_2",
+      "display_name": "Fty | 1850F, 1 hr, WQ + age, 8 hrs, AC | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_9",
+      "axis_id": "axis_3",
+      "display_name": "RA | 1750F, 1 hr, WQ + age, 8 hrs, AC | open circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_10",
+      "axis_id": "axis_3",
+      "display_name": "RA | 1750F, 1 hr, WQ + age, 8 hrs, AC | dashed trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_11",
+      "axis_id": "axis_3",
+      "display_name": "RA | 1850F, 1 hr, WQ + age, 8 hrs, AC | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_12",
+      "axis_id": "axis_3",
+      "display_name": "RA | 1850F, 1 hr, WQ + age, 8 hrs, AC | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_13",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in.) | 1750F, 1 hr, WQ + age, 8 hrs, AC | open square",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_14",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in.) | 1750F, 1 hr, WQ + age, 8 hrs, AC | dashed trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_15",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in.) | 1850F, 1 hr, WQ + age, 8 hrs, AC | filled square",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_16",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in.) | 1850F, 1 hr, WQ + age, 8 hrs, AC | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

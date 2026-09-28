@@ -1,0 +1,2123 @@
+{
+  "schema_version": "manual-manifest/v1",
+  "manual_id": "sha256:0413dd0e3f90f4c0e5dbe44ab5ac7571551f080ee04624fd761425432da3f3b8",
+  "source_pdf": "Ti-6V-4V(Wrought).pdf",
+  "page_count": 142,
+  "figure_job_count": 97,
+  "provenance": "Manual intake audit 2026-09-14; independently reviewed PDF blocks and OCR",
+  "pages": [
+    {
+      "source_page": 1,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 2,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 3,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 4,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 5,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 6,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 7,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 8,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 9,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 10,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 11,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 12,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 13,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 14,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 15,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.5.3",
+          "caption": "Figure 1.5.3 Effect of solution test temperature on tensile properties of sheet and bar (Refs. 8, 19, 20)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            31.805,
+            413.661,
+            278.837,
+            434.664
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 16,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.5.4",
+          "caption": "Figure 1.5.4 Effect of quench delay on tensile properties of aged bar (Ref. 21)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.319,
+            176.301,
+            240.635,
+            197.304
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 17,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.5.5",
+          "caption": "Figure 1.5.5 Effect of as quenched section size on tensile properties of aged bar (Ref. 13)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.88,
+            333.741,
+            221.787,
+            354.744
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 18,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.6.1",
+          "caption": "Figure 1.6.1 Effect of aging temperature on hardness of solution treated sheet (Ref. 49)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.267,
+            138.381,
+            219.616,
+            159.384
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 19,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.9.1",
+          "caption": "Figure 1.9.1 Directionality of tensile properties for strip product in annealed condition (Ref. 32)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.29,
+            304.941,
+            200.357,
+            325.704
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 20,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.9.2",
+          "caption": "Figure 1.9.2 Effect of rolling temperature and annealing treatment on the theoretical yield strength in 2:1 biaxial stress field (Ref. 45)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.245,
+            183.981,
+            185.106,
+            216.025
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 21,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.9.3",
+          "caption": "Figure 1.9.3 Directionality of strength and strain for tensile tests on three heats of annealed sheet (Ref, 33)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.735,
+            232.701,
+            217.442,
+            253.704
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 22,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.9.4",
+          "caption": "Figure 1.9.4 Effect of oxygen content on low temperature tensile properties of annealed sheet (Ref. 29)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            5.798,
+            305.901,
+            177.439,
+            337.945
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 23,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "1.9.5",
+          "caption": "Figure 1.9.5. Effect of oxygen content on low temperature mild notch properties of annealed sheet (Ref. 29)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            26.372,
+            198.861,
+            177.596,
+            230.664
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 24,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.1.3",
+          "caption": "Figure 2.1.3 Thermal conductivity (Refs. 7, 40)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.766,
+            241.581,
+            187.356,
+            251.544
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 25,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.1.4.1",
+          "caption": "Figure 2.1.4.1 Thermal expansion of annealed alloy (Refs. 7, 14, 18, 22)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.691,
+            148.941,
+            188.182,
+            169.944
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 26,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.1.4.2",
+          "caption": "Figure 2.1.4.2 Thermal expansion for aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.558,
+            212.781,
+            200.984,
+            233.784
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 27,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.1.5",
+          "caption": "Figure 2.1.5 Specific heat (Refs. 5, 40)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.934,
+            227.901,
+            162.737,
+            237.864
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 28,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.2.2",
+          "caption": "Figure 2.2.2 Electrical resistivity (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            20.489,
+            133.101,
+            171.237,
+            143.064
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 29,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.2.4",
+          "caption": "Figure 2.2.4 Total and spectral normal emittance for oxidized and polished surfaces (Ref. 37)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.897,
+            177.741,
+            189.771,
+            198.504
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 30,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "2.3.2.1",
+          "caption": "Figure 2.3.2.1 Effect of stress and temperature on 100 hour stress corrosion of annealed and aged sheet (Ref. 46)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.267,
+            214.221,
+            239.283,
+            235.224
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 31,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 32,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 33,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 34,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 35,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 36,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 37,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 38,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 39,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 40,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 41,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 42,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 43,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 44,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 45,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 46,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 47,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.1",
+          "caption": "Figure 3.2.1.1 Effect of annealing temperature on the tensile properties for ELI plate (Ref. 53)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.01,
+            281.661,
+            213.002,
+            302.664
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 48,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.2",
+          "caption": "Figure 3.2.1.2 Effect of aging temperature on the tensile properties of sheet and forgings (Ref. 43, 49)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.081,
+            214.701,
+            221.84,
+            235.704
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 49,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.3",
+          "caption": "Figure 3.2.1.3 Effect of stretching after solution treating on tensile properties of aged sheet (Ref. 19)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            22.247,
+            245.163,
+            209.698,
+            268.209
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 50,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.4",
+          "caption": "Figure 3.2.1.4 Effect of stretching on compressive and tensile yield strengths of annealed and aged sheet (Ref. 17)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.885,
+            207.723,
+            174.357,
+            241.81
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 51,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.5",
+          "caption": "Figure 3.2.1.5 Effect of exposure to elevated temperatures with and without load on tensile properties of annealed sheet (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.122,
+            150.123,
+            236.818,
+            184.209
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 52,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.6",
+          "caption": "Figure 3.2.1.6 Effect of exposure to elevated temperatures with load on tensile properties of annealed bar (Ref. 18)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            32.096,
+            200.763,
+            233.948,
+            234.609
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 53,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.7",
+          "caption": "Figure 3.2.1.7 Effect of short time exposure to elevated temperature on tensile properties of aged sheet (Ref. 23)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            29.156,
+            279.243,
+            231.955,
+            302.049
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 54,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.8",
+          "caption": "Figure 3.2.1.8 Effect of strain rate on tensile properties of annealed and aged bar (Ref. 13)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.382,
+            221.403,
+            235.734,
+            244.449
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 55,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.9.A",
+          "caption": "Figure 3.2.1.9.A Tensile properties of two beta annealed step forgings (Ref. 63)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            30.894,
+            334.683,
+            320.562,
+            346.689
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 56,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.9.B",
+          "caption": "Figure 3.2.1.9.B Tensile properties of two beta annealed step forgings (Ref. 63)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.527,
+            339.243,
+            314.708,
+            351.249
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 57,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.9.C",
+          "caption": "Figure 3.2.1.9.C Tensile properties of two beta annealed step forgings (Ref. 63)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.024,
+            333.483,
+            310.204,
+            345.489
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 58,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.9.D",
+          "caption": "Figure 3.2.1.9.D Tensile properties of two beta annealed step forgings (Ref. 63)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            20.61,
+            331.803,
+            310.286,
+            343.809
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 59,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.5.1",
+          "caption": "Figure 3.2.5.1 Effect of thickness on shear strength of annealed sheet (Ref. 16)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.352,
+            147.003,
+            215.707,
+            170.049
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 60,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.1.1",
+          "caption": "Figure 3.2.7.1.1 Effect of stress concentration on notch strength of aged sheet (Ref. 10)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            20.225,
+            160.923,
+            221.339,
+            183.969
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 61,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.1.2",
+          "caption": "Figure 3.2.7.1.2 Effect of notch geometry on notch strength of aged sheet and plate at room temperature (Ref. 11)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.953,
+            214.203,
+            233.18,
+            237.249
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 62,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.1.3",
+          "caption": "Figure 3.2.7.1.3 Effect of aging temperature on the sharp notch strength of sheet (Ref. 49)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.823,
+            184.203,
+            233.47,
+            207.249
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 63,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 64,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.2.3",
+          "caption": "Figure 3.2.7.2.3 Fracture toughness values vs average yield strength for two beta annealed forgings (Ref. 63)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.785,
+            338.283,
+            411.356,
+            350.289
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 65,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.2.4",
+          "caption": "Figure 3.2.7.2.4 Results of ASTM E399 SE(B) fracture tests on α-β forged mill annealed plate showing that the E399 size requirement tends to underestimate the plane strain fracture toughness (Ref. 91)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.317,
+            303.483,
+            425.41,
+            326.289
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 66,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.7.2.5",
+          "caption": "Figure 3.2.7.2.5 Results of ASTM E399 SE(B) fracture tests on β forged 3 in. plate showing that the E399 size requirement tends to underestimate the plane strain fracture toughness (Ref. 91)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            27.426,
+            303.243,
+            430.143,
+            326.049
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 67,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.1",
+          "caption": "Figure 3.3.1.1 Stress-strain curves at various temperatures for annealed sheet (Ref. 3, 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.542,
+            277.563,
+            184.732,
+            300.609
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 68,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.10",
+          "caption": "Figure 3.3.1.10 Effect of test temperature and testing direction on tensile properties for aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            27.416,
+            374.523,
+            222.524,
+            397.569
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 69,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.11",
+          "caption": "Figure 3.3.1.11 Effect of low and elevated temperatures on the tensile properties of aged sheet (Ref. 36)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            27.059,
+            271.323,
+            255.069,
+            294.369
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 70,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.12",
+          "caption": "Figure 3.3.1.12 Effect of exposure and test temperature on tensile properties for aged sheet (Ref. 15)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.267,
+            304.203,
+            224.666,
+            327.249
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 71,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.13",
+          "caption": "Figure 3.3.1.13 Effect of elevated temperature stressed exposure on the room and elevated temperature tensile properties of aged sheet (Ref. 40)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            27.872,
+            372.843,
+            227.32,
+            406.689
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 72,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.14",
+          "caption": "Figure 3.3.1.14 Effect of tensile test temperature on tensile properties of aged bar (Ref. 13)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            35.684,
+            307.803,
+            224.139,
+            330.849
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 73,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.15",
+          "caption": "Figure 3.3.1.15 Effect of test temperature on tensile properties of solution treated and aged specimens from forging (Ref. 2)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.496,
+            307.563,
+            213.951,
+            341.65
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 74,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 75,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.2",
+          "caption": "Figure 3.3.1.2 Stress-strain curves at room and elevated temperatures for annealed bar (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            26.636,
+            267.723,
+            229.698,
+            290.769
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 76,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.3",
+          "caption": "Figure 3.3.1.3. Longitudinal stress-strain in curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.84,
+            208.203,
+            202.387,
+            231.249
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 77,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.4",
+          "caption": "Figure 3.3.1.4 Transverse tension stress-strain curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            22.715,
+            223.803,
+            191.176,
+            257.649
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 78,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.5",
+          "caption": "Figure 3.3.1.5 Stress-strain curves at low temperatures for aged sheet (Ref. 40)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.303,
+            281.163,
+            213.066,
+            304.209
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 79,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.6",
+          "caption": "Figure 3.3.1.6 Spread of tensile test data at room and elevated temperatures for annealed sheet and bar (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            30.29,
+            405.963,
+            223.718,
+            439.809
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 80,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.7",
+          "caption": "Figure 3.3.1.7 Effect of low test temperature on tensile properties of annealed sheet (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.674,
+            271.083,
+            218.345,
+            293.889
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 81,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.8",
+          "caption": "Figure 3.3.1.8 Effect of low test temperature on tensile properties of annealed sheet and bar (Ref. 4, 36, 44)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            10.796,
+            320.043,
+            258.499,
+            343.089
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 82,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.9",
+          "caption": "Figure 3.3.1.9 Spread of tensile data at room and elevated temperatures for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.627,
+            404.523,
+            234.337,
+            427.569
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 83,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.1",
+          "caption": "Figure 3.3.2.1 Longitudinal stress-strain curves in compression at room and elevated temperature for annealed sheet (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            24.212,
+            274.683,
+            239.251,
+            308.529
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 84,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.2",
+          "caption": "Figure 3.3.2.2 Longitudinal compression stress-strain curves at elevated temperature for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.225,
+            243.723,
+            214.012,
+            266.769
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 85,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.3",
+          "caption": "Figure 3.3.2.3 Transverse compression stress-strain curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.292,
+            241.083,
+            216.678,
+            264.129
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 86,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.4",
+          "caption": "Figure 3.3.2.4 Stress-strain curves in compression at room and elevated temperatures for annealed bar (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.519,
+            274.683,
+            249.748,
+            297.729
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 87,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.5",
+          "caption": "Figure 3.3.2.5 Spread of compressive yield strength at room and elevated temperatures for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.745,
+            288.123,
+            216.494,
+            321.969
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 88,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.2.6",
+          "caption": "Figure 3.3.2.6 Effect of exposure and test temperature on compressive yield strength of annealed and aged sheet and bar (Ref. 15, 19)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            28.745,
+            339.243,
+            237.09,
+            373.089
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 89,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 90,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.3.1",
+          "caption": "Figure 3.3.3.1 Effect of test temperature on impact strength of annealed and aged plate and bar (Ref. 13)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.332,
+            180.363,
+            239.334,
+            203.409
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 91,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.5.1",
+          "caption": "Figure 3.3.5.1 Spread of shear strength at room and elevated temperature for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.998,
+            155.643,
+            200.167,
+            189.489
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 92,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.5.2",
+          "caption": "Figure 3.3.5.2 Effect of test temperature on shear strength of annealed and aged sheet and annealed bar (Ref. 3, 13, 19)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            12.452,
+            175.563,
+            223.204,
+            209.65
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 93,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.6.1",
+          "caption": "Figure 3.3.6.1 Spread of bearing strength at room and elevated temperatures for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            26.878,
+            336.363,
+            229.214,
+            370.45
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 94,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.6.2",
+          "caption": "Figure 3.3.6.2 Effect of test temperature on bearing properties of annealed sheet (Ref. 3, 37)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.252,
+            287.403,
+            202.742,
+            310.449
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 95,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.6.3",
+          "caption": "Figure 3.3.6.3 Effect of exposure and test temperature on bearing properties of aged sheet (Ref. 15)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.812,
+            269.643,
+            222.157,
+            292.449
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 96,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.1",
+          "caption": "Figure 3.3.7.1.1 Notch strength ratio as function of stress-concentration factor for annealed sheet tested at room temperature and -320F (Ref. 36)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            22.079,
+            191.643,
+            208.316,
+            225.489
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 97,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.10",
+          "caption": "Figure 3.3.7.1.10 Effect of test temperature on sharp notch strength ratio and plane strain fracture toughness and of solution treated and aged round bars cut from forging (Ref. 26)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.965,
+            244.683,
+            217.222,
+            289.57
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 98,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 99,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.2",
+          "caption": "Figure 3.3.7.1.2 Notch strength ratio as function of stress concentration factor for aged sheet tested at room temperature and -320F (Ref. 26)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            34.372,
+            222.843,
+            234.77,
+            256.93
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 100,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.3",
+          "caption": "Figure 3.3.7.1.3 Effect of test temperature and stress concentration factor on notch strength of aged sheet (Ref. 10)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            24.852,
+            209.883,
+            216.156,
+            243.97
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 101,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.4",
+          "caption": "Figure 3.3.7.1.4 Effect of low test temperatures on the mild and sharp notch properties of annealed ELI sheet (Ref. 44)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.812,
+            240.123,
+            223.37,
+            274.21
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 102,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.5",
+          "caption": "Figure 3.3.7.1.5 Effect of crack length on the sharp notch properties of annealed sheet, tested at several temperatures (Ref. 35)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            26.024,
+            180.603,
+            205.288,
+            214.69
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 103,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.6",
+          "caption": "Figure 3.3.7.1.6 Effect of test temperature on sharp notch properties of several heats of mill annealed sheet (Ref. 34)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            33.644,
+            242.283,
+            231.648,
+            276.37
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 104,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.7",
+          "caption": "Figure 3.3.7.1.7 Effect of test temperature on sharp notch strength of annealed sheet before and after elevated temperature exposure (Ref. 38)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            20.228,
+            181.323,
+            229.489,
+            215.41
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 105,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.8",
+          "caption": "Figure 3.3.7.1.8 Effect of test temperature on sharp notch strength of aged sheet before and after elevated temperature exposure (Ref. 36)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.499,
+            210.843,
+            228.76,
+            244.93
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 106,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.9",
+          "caption": "Figure 3.3.7.1.9 Effect of test temperature on the sharp notch properties of solution treated and aged specimens of various thicknesses cut from forging (Ref. 26)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            23.978,
+            327.243,
+            224.642,
+            361.33
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 107,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 108,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.4.1",
+          "caption": "Figure 3.4.1 Average creep and rupture curves at several temperatures for aged sheet from three heats (Ref. 41)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.422,
+            317.163,
+            224.603,
+            339.969
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 109,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.4.2",
+          "caption": "Figure 3.4.2 Creep and creep rupture curves at 750 and 850F for annealed bar (Ref. 9)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            22.232,
+            256.443,
+            208.229,
+            279.489
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 110,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.4.3",
+          "caption": "Figure 3.4.3 Creep and creep rupture curves at 650 to 850F for aged bar (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.725,
+            314.283,
+            217.076,
+            337.329
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 111,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 112,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 113,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 114,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.4",
+          "caption": "Figure 3.5.1.4 Stress range diagram at 107 cycles for smooth and notched specimens of mill annealed sheet (Ref. 27)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.4,
+            179.32,
+            199.146,
+            213.97
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 115,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.5",
+          "caption": "Figure 3.5.1.5 Stress range diagram at 107 cycles for smooth and notched specimens of aged sheet (Ref. 27)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.162,
+            196.12,
+            213.944,
+            219.729
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 116,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.1",
+          "caption": "Figure 3.5.3.1 Influence of load ratio (R) on fatigue crack growth for mill annealed plate in air at room temperature (Ref. 58)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            26.993,
+            348.123,
+            215.653,
+            382.21
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 117,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.2",
+          "caption": "Figure 3.5.3.2 Influence of environment on fatigue crack growth for mill annealed plate at room temperature (Ref. 59)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.811,
+            322.923,
+            225.256,
+            357.01
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 118,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.3",
+          "caption": "Figure 3.5.3.3 Fatigue crack growth in dehumidified argon for mill annealed plate at different temperatures and K levels (Ref. 60)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.838,
+            300.363,
+            220.237,
+            334.45
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 119,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.4",
+          "caption": "Figure 3.5.3.4 Fatigue crack growth rate as a function of stress intensity for two beta annealed forgings (Ref. 63).",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.49,
+            328.203,
+            429.153,
+            340.209
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 120,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.5",
+          "caption": "Figure 3.5.3.5 Crack growth response of 3 in. thick annealed Ti-6Al-4V, ELI forging (Ref. 86)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.659,
+            302.763,
+            357.549,
+            314.769
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 121,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.6",
+          "caption": "Figure 3.5.3.6 Crack growth response of 5 in. thick annealed Ti-6Al-4V, ELI forging (Ref. 86)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.19,
+            305.403,
+            361.08,
+            317.409
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 122,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.7",
+          "caption": "Figure 3.5.3.7 Crack growth behavior on 7 in. thick beta annealed Ti-6Al-4V, ELI forging (Ref. 86)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.27,
+            301.803,
+            381.173,
+            313.809
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 123,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.1.1",
+          "caption": "Figure 3.6.1.1 Effect of test temperature on poisson’s ratio (Ref. 40)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            20.753,
+            175.323,
+            215.378,
+            198.369
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 124,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.2.1",
+          "caption": "Figure 3.6.2.1 Spread of elastic modulus at room and elevated temperatures for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.717,
+            206.043,
+            220.053,
+            240.13
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 125,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.2.2",
+          "caption": "Figure 3.6.2.2 Modulus of elasticity at low and elevated temperatures for annealed sheet (Ref. 4, 36)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.706,
+            175.083,
+            206.793,
+            197.889
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 126,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.2.3",
+          "caption": "Figure 3.6.2.3 Dynamic modulus of elasticity for annealed bar at elevated temperatures (Ref. 24, 25)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.747,
+            163.323,
+            224.379,
+            186.369
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 127,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.2.4",
+          "caption": "Figure 3.6.2.4 Spread of elastic compressive modulus at room and elevated temperatures for eight heats of aged sheet (Ref. 39)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.047,
+            204.843,
+            219.523,
+            238.93
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 128,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.4.1",
+          "caption": "Figure 3.6.4.1 Tangent modulus curves in compression at room and elevated temperatures for annealed sheet (Ref. 3)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            25.172,
+            271.803,
+            209.26,
+            305.89
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 129,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.4.2",
+          "caption": "Figure 3.6.4.2 Longitudinal tensile tangent modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.384,
+            189.243,
+            195.455,
+            223.33
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 130,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.4.3",
+          "caption": "Figure 3.6.4.3 Transverse tensile tangent modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.08,
+            187.803,
+            173.962,
+            221.89
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 131,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.4.4",
+          "caption": "Figure 3.6.4.4 Longitudinal compression tangent modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            27.512,
+            217.323,
+            206.066,
+            251.169
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 132,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.4.5",
+          "caption": "Figure 3.6.4.5 Transverse compression tangent modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.05,
+            218.763,
+            192.406,
+            252.85
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 133,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.5.1",
+          "caption": "Figure 3.6.5.1 Longitudinal compression secant modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.588,
+            208.683,
+            185.458,
+            242.529
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 134,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.5.2",
+          "caption": "Figure 3.6.5.2 Transverse compression secant modulus curves at elevated temperatures for aged sheet (Ref. 42)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.758,
+            216.843,
+            186.053,
+            250.689
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 135,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 136,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 137,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 138,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "4.3.4",
+          "caption": "Figure 4.3.4 Effect of test temperature on the impact properties of plate welded with various fillers (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.0,
+            241.803,
+            250.29,
+            264.849
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 139,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 140,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 141,
+      "figure_status": "non_figure",
+      "text_layer_available": false,
+      "figures": []
+    },
+    {
+      "source_page": 142,
+      "figure_status": "non_figure",
+      "text_layer_available": false,
+      "figures": []
+    }
+  ]
+}

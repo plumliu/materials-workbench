@@ -1,0 +1,119 @@
+{
+  "figure_id": "2.3.2.1",
+  "image": "fig_2_3_2_1.png",
+  "source_ids": [
+    "sha256:1368b70e94e7dba013b5cf01a07f5c574644eb0ee35c4064ea8f5fabab98a34f"
+  ],
+  "selection_cues": [
+    "Exposure Temperature",
+    "Stress",
+    "corrosion",
+    "500",
+    "900"
+  ],
+  "tasks": [
+    "binding"
+  ],
+  "binding_lesson": "The reviewed human WPD TAR establishes the 500-900 F and 20-80 ksi mappings. The coordinates below place four visible values on the corresponding vector T intersections in the same full render, correcting the few-pixel human click offsets. Coordinates are normalized from the complete 732 by 726 image. X anchors share one horizontal baseline and Y anchors share one vertical spine; never use the printed-number centers.",
+  "binding_input": {
+    "structure": {
+      "groups": [
+        {
+          "x": {
+            "name": "Exposure Temperature (F)",
+            "scale": "linear"
+          },
+          "ys": [
+            {
+              "name": "Stress (ksi)",
+              "scale": "linear"
+            }
+          ]
+        }
+      ]
+    },
+    "image_size": [
+      732,
+      726
+    ]
+  },
+  "binding_output": {
+    "schema_version": "grounding/v3",
+    "coordinate_system": "normalized_0_1000",
+    "groups": [
+      {
+        "x": [
+          {
+            "visible_label": "500",
+            "value": 500.0,
+            "point_2d": [
+              185.11,
+              708.3
+            ]
+          },
+          {
+            "visible_label": "600",
+            "value": 600.0,
+            "point_2d": [
+              348.65,
+              708.3
+            ]
+          },
+          {
+            "visible_label": "800",
+            "value": 800.0,
+            "point_2d": [
+              678.28,
+              708.3
+            ]
+          },
+          {
+            "visible_label": "900",
+            "value": 900.0,
+            "point_2d": [
+              842.21,
+              708.3
+            ]
+          }
+        ],
+        "ys": [
+          [
+            {
+              "visible_label": "0",
+              "value": 0.0,
+              "point_2d": [
+                183.07,
+                709.36
+              ]
+            },
+            {
+              "visible_label": "40",
+              "value": 40.0,
+              "point_2d": [
+                183.07,
+                443.53
+              ]
+            },
+            {
+              "visible_label": "80",
+              "value": 80.0,
+              "point_2d": [
+                183.07,
+                176.31
+              ]
+            },
+            {
+              "visible_label": "100",
+              "value": 100.0,
+              "point_2d": [
+                183.07,
+                40.64
+              ]
+            }
+          ]
+        ]
+      }
+    ],
+    "unresolved": []
+  }
+}

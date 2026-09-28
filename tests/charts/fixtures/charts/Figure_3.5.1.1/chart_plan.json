@@ -1,0 +1,228 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:99f91854d1d7d7b8a4035949e67b0a04ec380261db7f82b065efe488e2a956f2",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 24,
+    "figure_id": "3.5.1.1",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "N_f - Maximum Stress (ksi) (A = ∞)",
+      "axis_type": "xy",
+      "x_scale": "log",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "N_f - Maximum Stress (ksi) (A = 0.67)",
+      "axis_type": "xy",
+      "x_scale": "log",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_3",
+      "display_name": "N_f - Maximum Stress (ksi) (A = 0.25",
+      "axis_type": "xy",
+      "x_scale": "log",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Smooth | Heat A | open circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Smooth | Heat B | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Notch | Heat A | open triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Notch | Heat B | filled triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Smooth | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_1",
+      "display_name": "A = ∞ | Notch | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_7",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Smooth | Heat A | open circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_8",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Smooth | Heat B | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_9",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Notch | Heat A | open triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_10",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Notch | Heat B | filled triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_11",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Smooth | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_12",
+      "axis_id": "axis_2",
+      "display_name": "A = 0.67 | Notch | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_13",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Smooth | Heat A | open circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_14",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Smooth | Heat B | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_15",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Notch | Heat A | open triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_16",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Notch | Heat B | filled triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_17",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Smooth | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_18",
+      "axis_id": "axis_3",
+      "display_name": "A = 0.25 | Notch | solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

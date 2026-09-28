@@ -1,0 +1,64 @@
+{
+  "figure_id": "3.2.7.2.3",
+  "image": "fig_3_2_7_2_3.png",
+  "source_ids": [
+    "sha256:914ca801d45106668791d70e6a3aff56126d2e5df47240321f4f28ca6d29ca41"
+  ],
+  "selection_cues": [
+    "Tensile yield strength - ksi",
+    "Tensile yield strength - MPa",
+    "KIC - MPa(m)^1/2",
+    "KIC - ksi(in)^1/2"
+  ],
+  "tasks": [
+    "axes",
+    "axes-repair"
+  ],
+  "input": {
+    "visible_text": [
+      "Tensile yield strength - ksi",
+      "Tensile yield strength - MPa",
+      "K_IC - MPa(m)^1/2",
+      "K_IC - ksi(in)^1/2",
+      "775 800 825 850 875 900",
+      "115 120 125",
+      "80 90 100 110 120",
+      "70 80 90 100 110"
+    ]
+  },
+  "axis_lesson": "One physical plot frame contains two complete, independently readable coordinate presentations of the same relationship. They must become two separate, independently calibrated WPD Axis objects: bottom MPa X pairs with left MPa(m)^1/2 Y, while top ksi X pairs with right ksi(in)^1/2 Y. Unit convertibility is cross-check evidence, not a reason to merge the Axes. Encode them as two groups; the later grounding anchors may occupy the same plot frame. Do not share X calibration between them and do not create mixed-unit Cartesian combinations.",
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Tensile yield strength - MPa",
+          "scale": "linear",
+          "categories": []
+        },
+        "ys": [
+          {
+            "name": "K_Ic - MPa(m)^1/2",
+            "scale": "linear",
+            "categories": []
+          }
+        ]
+      },
+      {
+        "x": {
+          "name": "Tensile yield strength - ksi",
+          "scale": "linear",
+          "categories": []
+        },
+        "ys": [
+          {
+            "name": "K_Ic - ksi(in)^1/2",
+            "scale": "linear",
+            "categories": []
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  }
+}

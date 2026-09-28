@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>表格人工核验</title>
+  <style>
+    :root { font: 14px/1.5 system-ui, "Microsoft YaHei", sans-serif; color: #1b2733; background: #f2f5f7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, select, input, textarea { font: inherit; }
+    button { cursor: pointer; border: 1px solid #c9d2d9; background: white; color: #18344a; border-radius: 7px; padding: 7px 11px; }
+    button:hover { background: #eaf2f6; }
+    button:disabled { opacity: .45; cursor: default; }
+    .primary { background: #0c6074; color: white; border-color: #0c6074; }
+    .primary:hover { background: #084d5e; }
+    header { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 20px; color: white; background: #173b4a; }
+    header h1 { font-size: 18px; margin: 0; letter-spacing: .03em; }
+    header select { min-width: 220px; max-width: 42vw; }
+    header .right { display: flex; align-items: center; gap: 12px; }
+    .shell { --sidebar-width: 210px; display: grid; grid-template-columns: var(--sidebar-width) 8px minmax(0, 1fr); height: calc(100vh - 62px); }
+    aside { background: #fff; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+    .side-top { padding: 15px; border-bottom: 1px solid #e1e7eb; }
+    .side-top input, .side-top select { width: 100%; margin-top: 9px; padding: 8px; border: 1px solid #c9d2d9; border-radius: 6px; background: white; }
+    #count { color: #63737e; margin-top: 8px; font-size: 12px; }
+    #table-list { overflow: auto; padding: 7px; flex: 1; }
+    .table-item { display: block; width: 100%; text-align: left; border: 0; border-radius: 7px; padding: 11px 9px; margin-bottom: 3px; }
+    .table-item.active { background: #dcebf0; }
+    .table-item strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .table-item small { display: block; color: #5f6f79; margin-top: 2px; }
+    .side-foot { padding: 12px 15px; border-top: 1px solid #e1e7eb; color: #63737e; font-size: 12px; }
+    main { min-width: 0; display: flex; flex-direction: column; }
+    .work-head { padding: 14px 18px; background: #fff; border-bottom: 1px solid #d5dee4; }
+    .work-head h2 { margin: 0 0 4px; font-size: 17px; }
+    .sub { color: #5e6d77; font-size: 12px; }
+    .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .status { padding: 4px 8px; border-radius: 99px; background: #e7edf1; font-size: 12px; }
+    .status.verified { background: #d9f3df; color: #116b30; }
+    .status.draft { background: #fff0d1; color: #845300; }
+    #message { font-size: 12px; color: #a73b2e; }
+    .panes { --source-width: 48%; display: grid; grid-template-columns: var(--source-width) 8px minmax(0, 1fr); min-height: 0; flex: 1; }
+    .pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+    .divider { position: relative; background: #e1e9ed; cursor: col-resize; touch-action: none; }
+    .divider:hover, .divider:focus-visible, body.resizing .divider.active { background: #78b6c4; outline: none; }
+    .divider::after { content: ''; position: absolute; width: 2px; height: 32px; left: 3px; top: calc(50% - 16px); border-radius: 2px; background: #8ba4ae; }
+    body.resizing { cursor: col-resize; user-select: none; }
+    .source { min-width: 0; }
+    .pane-bar { padding: 8px 12px; background: #e9eff2; border-bottom: 1px solid #cbd7de; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-height: 47px; }
+    .pane-bar strong { margin-right: auto; }
+    .page-btn.selected, .component-btn.selected { background: #0c6074; border-color: #0c6074; color: white; }
+    .zoom-button { display: inline-flex; align-items: center; gap: 3px; }
+    .zoom-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+    #page-check { margin-left: auto; white-space: nowrap; }
+    #page-check input { vertical-align: middle; }
+    .page-scroll { overflow: auto; flex: 1; background: #d7dce0; text-align: center; }
+    #page-image { display: block; width: 100%; max-width: none; height: auto; margin: 0 auto; box-shadow: 0 1px 8px #152a3b44; }
+    .editor-scroll { overflow: auto; flex: 1; padding: 14px; }
+    .component-meta { color: #63737e; font-size: 12px; margin: 0 0 8px; }
+    .grid { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; background: white; box-shadow: 0 1px 4px #152a3b1a; }
+    .grid th, .grid td { border-right: 1px solid #dce3e8; border-bottom: 1px solid #dce3e8; vertical-align: top; padding: 0; }
+    .grid th { background: #eaf0f4; color: #536673; font-size: 11px; text-align: center; position: sticky; top: 0; z-index: 1; padding: 5px; }
+    .grid th:first-child { width: 40px; }
+    .grid th.row-head { left: 0; z-index: 2; }
+    .grid textarea { display: block; border: 0; border-radius: 0; padding: 9px; resize: vertical; width: 100%; min-height: 42px; overflow: hidden; background: transparent; color: #1b2733; line-height: 1.45; }
+    .grid textarea:focus { outline: 2px solid #0c7893; outline-offset: -2px; background: #f6fcff; }
+    .grid textarea.changed { background: #fff7d8; }
+    .grid tr:first-child td { background: #f9fcfd; }
+    .review-meta { padding: 10px 14px; border-top: 1px solid #d5dee4; background: white; }
+    .review-meta label { display: block; font-weight: 600; }
+    .review-meta textarea { width: 100%; height: 50px; margin-top: 5px; padding: 7px; border: 1px solid #ccd6dc; border-radius: 6px; resize: vertical; }
+    #footnotes { color: #566773; font-size: 12px; margin-top: 6px; max-height: 58px; overflow: auto; }
+    .empty { margin: auto; text-align: center; color: #74838d; padding: 30px; }
+    @media (max-width: 760px) { .shell { --sidebar-width: 170px; } .panes { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(300px, 48%) minmax(320px, 52%); } #pane-divider { display: none; } .source { border-bottom: 1px solid #cbd7de; } }
+  </style>
+</head>
+<body>
+<header><h1><a href="/" style="color:inherit;text-decoration:none">材料手册工作台</a> / 表格核验</h1><div class="right"><span>手册</span><select id="manual"></select></div></header>
+<div class="shell">
+  <aside id="sidebar">
+    <div class="side-top"><strong>逻辑表格</strong><input id="search" type="search" placeholder="搜索编号或标题"><select id="filter"><option value="all">全部状态</option><option value="unreviewed">未核验</option><option value="draft">草稿</option><option value="verified">已确认</option><option value="stale">底表已变化</option></select><div id="count"></div></div>
+    <div id="table-list"></div>
+    <div class="side-foot">人工记录保存在 run 中。重新组装 library 时，只应用已确认的修订。</div>
+  </aside>
+  <div id="sidebar-divider" class="divider" role="separator" aria-orientation="vertical" aria-label="调整左侧列表宽度" tabindex="0" title="拖动调整左侧列表宽度"></div>
+  <main>
+    <div id="empty" class="empty">请选择手册和表格。</div>
+    <div id="workspace" hidden style="display:none; flex:1; min-height:0; flex-direction:column">
+      <div class="work-head"><h2 id="caption"></h2><div id="subtitle" class="sub"></div><div class="actions"><span id="status" class="status"></span><span id="edit-count" class="sub"></span><button id="save-draft">保存草稿</button><button id="verify" class="primary">确认核验</button><span id="message"></span></div></div>
+      <div class="panes">
+        <section id="source-pane" class="pane source"><div class="pane-bar"><strong id="source-label">原PDF来源：页</strong><span id="page-buttons"></span><button id="zoom-out" class="zoom-button" title="缩小来源页" aria-label="缩小来源页"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="m12 12 5 5"></path></svg>−</button><button id="zoom-in" class="zoom-button" title="放大来源页" aria-label="放大来源页"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="m12 12 5 5"></path></svg>＋</button><label id="page-check"><input type="checkbox"> 本页已核对</label><a id="open-pdf" target="_blank" rel="noopener">打开 PDF</a></div><div class="page-scroll"><img id="page-image" alt="原 PDF 来源页渲染图"></div></section>
+        <div id="pane-divider" class="divider" role="separator" aria-orientation="vertical" aria-label="调整原 PDF 与表格的宽度" tabindex="0" title="拖动调整原 PDF 与表格的宽度"></div>
+        <section class="pane"><div class="pane-bar"><strong>OCR + Luna 表格</strong><span id="component-buttons"></span></div><div class="editor-scroll"><div id="component-meta" class="component-meta"></div><div id="grid-host"></div></div><div class="review-meta"><label for="notes">核验备注</label><textarea id="notes" placeholder="记录人工判断、仍需处理的结构问题等"></textarea><div id="footnotes"></div></div></section>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let manual = '', tables = [], current = null, selectedPage = 0, selectedComponent = 0, zoom = 1;
+let changes = new Map(), checkedPages = new Set(), dirty = false, saving = false, loading = false, editVersion = 0;
+
+async function api(path, options) {
+  const response = await fetch(path, options);
+  const data = response.headers.get('Content-Type')?.includes('json') ? await response.json() : null;
+  if (!response.ok) throw new Error(data?.error || `HTTP ${response.status}`);
+  return data;
+}
+const params = (id, extra = {}) => new URLSearchParams({manual, id, ...extra});
+const keyOf = (component, row, column) => `${component}|${row}|${column}`;
+function setMessage(text, ok = false) { $('message').textContent = text; $('message').style.color = ok ? '#116b30' : '#a73b2e'; }
+function markDirty() {
+  editVersion++;
+  dirty = true;
+  $('status').textContent = '未保存';
+  $('status').className = 'status draft';
+  $('edit-count').textContent = `${changes.size} 处单元格修订`;
+  setMessage('');
+}
+function visibleTables() {
+  const q = $('search').value.trim().toLowerCase(), filter = $('filter').value;
+  return tables.filter(item => (filter === 'all' || item.review_status === filter) && item.caption.toLowerCase().includes(q));
+}
+function renderList() {
+  const list = $('table-list'); list.replaceChildren();
+  const visible = visibleTables();
+  $('count').textContent = `显示 ${visible.length} / ${tables.length} 张`;
+  for (const item of visible) {
+    const button = document.createElement('button');
+    button.className = `table-item${item.id === current?.id ? ' active' : ''}`;
+    const title = document.createElement('strong'); title.textContent = item.caption;
+    const detail = document.createElement('small');
+    detail.textContent = `页 ${item.pages.join('、')} · ${ {unreviewed:'未核验',draft:'草稿',verified:'已确认',stale:'底表已变化'}[item.review_status] }`;
+    button.append(title, detail); button.onclick = () => selectTable(item.id); list.append(button);
+  }
+}
+async function loadManual(name) {
+  if (saving || loading) { $('manual').value = manual; return; }
+  if (dirty && !confirm('当前修改尚未保存。确定切换手册吗？')) { $('manual').value = manual; return; }
+  manual = name; current = null; dirty = false;
+  $('search').value = '';
+  $('workspace').style.display = 'none'; $('workspace').hidden = true; $('empty').hidden = false;
+  tables = await api(`/api/tables?${new URLSearchParams({manual})}`);
+  renderList();
+  if (tables.length) await selectTable(tables[0].id);
+}
+async function selectTable(id) {
+  if (saving || loading) return;
+  if (current?.id === id) return;
+  if (dirty && !confirm('当前修改尚未保存。确定切换表格吗？')) return;
+  loading = true;
+  try {
+    const data = await api(`/api/table?${params(id)}`);
+    current = data;
+    selectedPage = data.pages[0]; selectedComponent = 0; zoom = 1;
+    checkedPages = new Set(data.review.reviewed_pages);
+    changes = new Map(data.review.changes.map(change => [keyOf(change.component_id, change.row, change.column), change]));
+    dirty = false;
+    $('empty').hidden = true; $('workspace').hidden = false; $('workspace').style.display = 'flex';
+    $('caption').textContent = data.caption;
+    $('subtitle').textContent = `${data.pages.length} 个来源页 · ${data.components.length} 个组件 · 机器状态：${data.source_status || '未知'}`;
+    $('notes').value = data.review.notes;
+    $('footnotes').textContent = data.footnotes ? `原表脚注：${data.footnotes}` : '';
+    $('status').textContent = data.review.revision ? {verified:'已确认',draft:'草稿'}[data.review.status] : '未核验';
+    $('status').className = `status ${data.review.revision ? data.review.status : ''}`;
+    $('edit-count').textContent = `${changes.size} 处单元格修订`;
+    setMessage(data.review.stale ? '底表已更新，旧修订保留在文件中。请重新核验当前内容后保存。' : ''); renderPages(); renderComponents(); renderList();
+  } catch (error) { setMessage(error.message); } finally { loading = false; }
+}
+function renderPages() {
+  const host = $('page-buttons'); host.replaceChildren();
+  $('source-label').textContent = `原PDF来源：页${selectedPage}`;
+  for (const page of current.pages.length > 1 ? current.pages : []) {
+    const button = document.createElement('button');
+    button.className = `page-btn${page === selectedPage ? ' selected' : ''}`;
+    button.textContent = `${checkedPages.has(page) ? '✓ ' : ''}${page}`;
+    button.onclick = () => { selectedPage = page; renderPages(); };
+    host.append(button);
+  }
+  $('page-check').querySelector('input').checked = checkedPages.has(selectedPage);
+  const url = `/api/page?${params(current.id, {page: selectedPage})}`;
+  $('page-image').src = `/api/page-image?${params(current.id, {page: selectedPage})}`;
+  $('page-image').style.width = `${zoom * 100}%`;
+  $('open-pdf').href = url;
+}
+function renderComponents() {
+  const host = $('component-buttons'); host.replaceChildren();
+  current.components.forEach((part, index) => {
+    const button = document.createElement('button');
+    button.className = `component-btn${index === selectedComponent ? ' selected' : ''}`;
+    button.textContent = current.components.length === 1 ? '表格' : `组件 ${index + 1}`;
+    button.onclick = () => { selectedComponent = index; renderComponents(); };
+    host.append(button);
+  });
+  renderGrid();
+}
+function renderGrid() {
+  const part = current.components[selectedComponent], host = $('grid-host'); host.replaceChildren();
+  $('component-meta').textContent = `${part.title ? part.title + ' · ' : ''}来源页 ${part.pages.join('、')} · ${part.rows.length} 行`;
+  const table = document.createElement('table'); table.className = 'grid';
+  const width = Math.max(0, ...part.rows.map(row => row.length));
+  table.style.minWidth = `${40 + width * 150}px`;
+  const heading = document.createElement('tr');
+  for (let column = 0; column <= width; column++) {
+    const th = document.createElement('th'); th.textContent = column ? String(column) : '#'; heading.append(th);
+  }
+  table.append(heading);
+  const anchors = new Map(), covered = new Set();
+  for (const cell of part.cells) {
+    if (cell.rowspan > 1 || cell.colspan > 1) {
+      anchors.set(`${cell.row}|${cell.column}`, cell);
+      for (let r = cell.row; r < cell.row + cell.rowspan; r++) for (let c = cell.column; c < cell.column + cell.colspan; c++)
+        if (r !== cell.row || c !== cell.column) covered.add(`${r}|${c}`);
+    }
+  }
+  part.rows.forEach((row, rowIndex) => {
+    const tr = document.createElement('tr'), rowNumber = rowIndex + 1;
+    const th = document.createElement('th'); th.className = 'row-head'; th.textContent = rowNumber; tr.append(th);
+    row.forEach((base, columnIndex) => {
+      const column = columnIndex + 1, address = `${rowNumber}|${column}`;
+      if (covered.has(address)) return;
+      const td = document.createElement('td'), anchor = anchors.get(address);
+      if (anchor) { td.rowSpan = anchor.rowspan; td.colSpan = anchor.colspan; }
+      const input = document.createElement('textarea'); input.rows = 1;
+      input.setAttribute('aria-label', `组件 ${selectedComponent + 1}，第 ${rowNumber} 行，第 ${column} 列`);
+      const key = keyOf(part.id, rowNumber, column);
+      input.value = changes.get(key)?.after ?? base;
+      input.classList.toggle('changed', changes.has(key));
+      input.oninput = () => {
+        if (input.value === base) changes.delete(key);
+        else changes.set(key, {component_id: part.id, row: rowNumber, column, before: base, after: input.value});
+        input.style.height = 'auto'; input.style.height = `${Math.max(42, input.scrollHeight + 2)}px`;
+        input.classList.toggle('changed', changes.has(key)); markDirty();
+      };
+      td.append(input); tr.append(td);
+    });
+    table.append(tr);
+  });
+  host.append(table);
+  for (const input of table.querySelectorAll('textarea')) {
+    input.style.height = `${Math.max(42, input.scrollHeight + 2)}px`;
+  }
+}
+async function save(status) {
+  if (!current || saving || loading) return;
+  if (status === 'verified' && current.pages.some(page => !checkedPages.has(page))) {
+    setMessage('请先逐页勾选全部来源页。'); return;
+  }
+  saving = true;
+  $('save-draft').disabled = $('verify').disabled = true;
+  const submittedVersion = editVersion;
+  const payload = {
+    base_revision: current.review.base_revision,
+    revision: current.review.revision, status,
+    reviewed_pages: current.pages.filter(page => checkedPages.has(page)),
+    notes: $('notes').value, changes: [...changes.values()],
+  };
+  try {
+    const saved = await api(`/api/review?${params(current.id)}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload),
+    });
+    current.review = saved; dirty = editVersion !== submittedVersion;
+    const item = tables.find(table => table.id === current.id); item.review_status = status;
+    $('status').textContent = status === 'verified' ? '已确认' : '草稿';
+    $('status').className = `status ${status}`;
+    setMessage(status === 'verified' ? '已确认；下次组装将应用这些修订。' : '草稿已保存。', true);
+    renderList();
+  } catch (error) { setMessage(error.message); } finally { saving = false; $('save-draft').disabled = $('verify').disabled = false; }
+}
+$('search').oninput = renderList;
+$('filter').onchange = renderList;
+$('manual').onchange = event => loadManual(event.target.value).catch(error => setMessage(error.message));
+$('page-check').querySelector('input').onchange = event => {
+  if (event.target.checked) checkedPages.add(selectedPage); else checkedPages.delete(selectedPage);
+  markDirty(); renderPages();
+};
+$('notes').oninput = markDirty;
+$('save-draft').onclick = () => save('draft');
+$('verify').onclick = () => save('verified');
+$('zoom-out').onclick = () => { zoom = Math.max(.75, zoom - .25); $('page-image').style.width = `${zoom * 100}%`; };
+$('zoom-in').onclick = () => { zoom = Math.min(3, zoom + .25); $('page-image').style.width = `${zoom * 100}%`; };
+function makeResizable(handleId, container, panel, property, minimum, remaining) {
+  const handle = $(handleId);
+  const setWidth = width => {
+    const maximum = Math.max(minimum, container.clientWidth - remaining - handle.offsetWidth);
+    const next = Math.min(maximum, Math.max(minimum, width));
+    container.style.setProperty(property, `${next}px`);
+    handle.setAttribute('aria-valuenow', String(Math.round(next)));
+  };
+  let pointer = null, startX = 0, startWidth = 0;
+  const stop = event => {
+    if (event.pointerId !== pointer) return;
+    pointer = null; handle.classList.remove('active'); document.body.classList.remove('resizing');
+    if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+  };
+  handle.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    pointer = event.pointerId; startX = event.clientX; startWidth = panel.getBoundingClientRect().width;
+    handle.setPointerCapture(pointer); handle.classList.add('active'); document.body.classList.add('resizing');
+    event.preventDefault();
+  });
+  handle.addEventListener('pointermove', event => {
+    if (event.pointerId === pointer) setWidth(startWidth + event.clientX - startX);
+  });
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
+  handle.addEventListener('lostpointercapture', stop);
+  handle.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    setWidth(panel.getBoundingClientRect().width + (event.key === 'ArrowRight' ? 24 : -24));
+    event.preventDefault();
+  });
+  return () => {
+    if (container.style.getPropertyValue(property) && container.clientWidth) setWidth(panel.getBoundingClientRect().width);
+  };
+}
+const clampSidebar = makeResizable('sidebar-divider', document.querySelector('.shell'), $('sidebar'), '--sidebar-width', 150, 450);
+const clampSource = makeResizable('pane-divider', document.querySelector('.panes'), $('source-pane'), '--source-width', 220, 300);
+window.addEventListener('resize', () => { clampSidebar(); clampSource(); });
+window.onbeforeunload = event => { if (dirty || saving) { event.preventDefault(); event.returnValue = ''; } };
+setInterval(async () => {
+  if (!manual || loading || saving) return;
+  const requestedManual = manual;
+  try {
+    const updated = await api(`/api/tables?${new URLSearchParams({manual})}`);
+    if (manual === requestedManual) { tables = updated; renderList(); }
+  } catch (error) { setMessage(error.message); }
+}, 3000);
+(async () => {
+  try {
+    const manuals = await api('/api/manuals');
+    $('manual').replaceChildren(...manuals.map(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; return option; }));
+    if (manuals.length) { const selected = new URLSearchParams(location.search).get("manual"); $("manual").value = manuals.includes(selected) ? selected : manuals[0]; await loadManual($("manual").value); } else $('empty').textContent = '尚无可核验的表格，请在总览查看处理进度。';
+  } catch (error) { $('empty').textContent = error.message; }
+})();
+</script>
+</body>
+</html>

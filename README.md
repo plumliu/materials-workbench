@@ -1,22 +1,41 @@
 # Materials Workbench
 
-材料手册工作台：准备 Figure 标注项目，在内嵌 WebPlotDigitizer 中人工采点，核验 OCR + Luna 表格，最后组装可追溯的手册目录树。
+材料手册工作台。共享 intake 后，图像 LangGraph 与表格 MinerU / Luna 独立运行；网页负责 Figure 人工采点、表格核验和最终组装。
 
-当前完成了仓库调研、Git 初始化、Python 3.12 环境、合并依赖安装和兼容检查。业务代码迁移及统一网页属于下一阶段，具体方案见 [整合方案](docs/INTEGRATION_PLAN.md)。
+**日常使用请读 [使用说明](USER_GUIDE.md)。** 启动本地网页可直接让 Codex 帮忙，默认地址为 <http://127.0.0.1:8766/>。
 
-## 环境
+## 开发入口
 
-本项目统一使用 Python 3.12 和 uv，依赖已记录在 `pyproject.toml` 与 `uv.lock`。开发者可用 `uv sync` 重建环境。
+使用 Python 3.12 与 uv：
 
-原两个项目的配置已合并到根目录 `.env`，该文件由 Git 忽略。需要新建配置时参考 `.env.example`，在编辑器中填写。现有模型接口配置已保留；原配置中的 `MINERU_TOKEN` 为空，下一次调用 MinerU 前需要填写。
+```text
+uv sync
+uv run materials-workbench serve
+```
 
-原始 PDF 放在 `pdfs/`，Figure 资产放在 `figure_assets/`，处理记录放在 `runs/`，最终成品放在 `library/`。这些目录均不进入 Git。每本手册的处理记录按手册名和 Figure/Table 编号组织，不采用层层随机目录。
+唯一命令行入口是 `materials-workbench`。模型处理由 Codex 跟进：
 
-WebPlotDigitizer 使用 5.3 源码，固定到本次核查的官方提交；开发准备文件位于被忽略的 `.research/` 中。正式整合时将所需前端源码和许可证放入 `vendor/`，由同一个本地服务提供页面。
+```text
+uv run materials-workbench intake "手册名"
+uv run materials-workbench figures "手册名" --workers 2
+uv run materials-workbench tables "手册名"
+uv run materials-workbench apply-luna "手册名"
+uv run materials-workbench assemble "手册名"
+```
 
-## 当前验证
+`figures` 与 `tables` 可以同时运行。Luna 由 Codex 按根目录合同派发 `gpt-6-luna`、`xhigh` 子代理；完成一个批次就可以执行 `apply-luna`，发布已就绪的逻辑表。单图重试用 `figures "手册名" --figure Figure_编号 --retry`，已有人工 TAR 不会被模型覆盖。
 
-- 两个旧项目在新环境中运行：图像项目 151 项测试通过，表格项目 49 项测试通过。
-- 15 个运行依赖的主要模块均能导入；`uv pip check` 通过。
-- WPD 5.3 核心代码通过 11 份项目的载入与序列化检查，包括 3 份由现有导出器生成的空 Dataset 项目和 8 份人工标注样本。
-- 3 份空项目添加数据点后能够序列化、重新载入并保留数据点。统一网页的导入、保存和切换流程仍待实现及浏览器验收。
+配置统一在根目录 `.env`；新建环境时复制 `.env.example` 并在编辑器填写。Git 追踪代码、文档、依赖清单和不含密钥的 `.env.example`。`pdfs/`、`figure_assets/`、`runs/`、`library/` 各自仅追踪 `.gitkeep` 占位文件，目录内的手册数据和产物均忽略；`.env`、依赖环境与缓存也不追踪。
+
+这是 hardcut：新工作台只接受自己的目录及协议，旧项目的 CLI、manifest、状态目录不作为输入。两个算法包保留模块名，供新工作台内部调用。
+
+## 代码与约定
+
+- `src/materials_workbench/`：统一入口、状态、并行互斥、网页 API。
+- `src/chart_annotator/`：intake、LangGraph、轴校准与空 Dataset TAR 导出。
+- `src/pdf_tree_workflow/`：表格 OCR、Luna 补丁、人工修订及目录树组装。
+- `front_end/`：手册总览、图像标注、表格核验。
+- `vendor/wpd/`：固定版本的 WebPlotDigitizer 5.3、依赖和许可证。
+- [架构与产物](docs/INTEGRATION_PLAN.md)、[Luna 合同](LUNA_TABLE_REVIEW_CONTRACT.md)、[组装合同](PDF_TREE_CONTRACT.md)。
+
+运行检查：`uv run pytest tests -q`、`uv run ruff check src tests`。离线测试不会调用付费服务；完整手册回归需要本机 `pdfs/` 中的两本材料手册，否则自动跳过。

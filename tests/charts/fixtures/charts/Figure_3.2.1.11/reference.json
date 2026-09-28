@@ -1,0 +1,159 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.2.1.11",
+  "source_tar_sha256": "a3ed1a243d4c10492d03acc044135aba319394e17b88091e3892c24f7a0cf2db",
+  "axis_count": 4,
+  "dataset_count": 8,
+  "known_difficulty": "Four axes; upper/average/lower ordered point groups plus separate trends.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "Aging Temperature (F) - Ftu (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 114.24541607898449,
+          "py": 834.7531734837801,
+          "dx": "700",
+          "dy": "160",
+          "dz": null
+        },
+        {
+          "px": 555.9943582510579,
+          "py": 834.7531734837801,
+          "dx": "1300",
+          "dy": "160",
+          "dz": null
+        },
+        {
+          "px": 115.76868829337096,
+          "py": 569.703808180536,
+          "dx": "700",
+          "dy": "160",
+          "dz": null
+        },
+        {
+          "px": 115.76868829337096,
+          "py": 389.95768688293373,
+          "dx": "1300",
+          "dy": "190",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Aging Temperature (F) - Fty (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 114.24541607898449,
+          "py": 834.7531734837801,
+          "dx": "700",
+          "dy": "150",
+          "dz": null
+        },
+        {
+          "px": 555.9943582510579,
+          "py": 836.2764456981665,
+          "dx": "1300",
+          "dy": "150",
+          "dz": null
+        },
+        {
+          "px": 557.5176304654443,
+          "py": 690.0423131170663,
+          "dx": "700",
+          "dy": "150",
+          "dz": null
+        },
+        {
+          "px": 557.5176304654443,
+          "py": 510.29619181946407,
+          "dx": "1300",
+          "dy": "180",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Aging Temperature (F) - RA (Percent)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 114.24541607898449,
+          "py": 833.2299012693935,
+          "dx": "700",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 555.9943582510579,
+          "py": 834.7531734837801,
+          "dx": "1300",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 114.24541607898449,
+          "py": 807.3342736248237,
+          "dx": "700",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 115.76868829337096,
+          "py": 750.9732016925248,
+          "dx": "1300",
+          "dy": "20",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Aging Temperature (F) - e(1 in) (Percent)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 115.47954866008466,
+          "py": 834.8025387870242,
+          "dx": "700",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 556.241184767278,
+          "py": 834.8025387870242,
+          "dx": "1300",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 556.241184767278,
+          "py": 834.8025387870242,
+          "dx": "700",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 556.241184767278,
+          "py": 780.1480959097323,
+          "dx": "1300",
+          "dy": "20",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

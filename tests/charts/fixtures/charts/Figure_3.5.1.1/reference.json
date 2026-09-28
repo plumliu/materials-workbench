@@ -1,0 +1,122 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.5.1.1",
+  "source_tar_sha256": "b3d202129dcea448f2766a178aa50ab87304dedeef9a360f5fc978f4366713f3",
+  "axis_count": 3,
+  "dataset_count": 18,
+  "known_difficulty": "Logarithmic x, three data regions, repeated y tick values across panels.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "N_f - Maximum Stress (ksi) (A = ∞)",
+      "type": "XYAxes",
+      "isLogX": true,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 104.9052247873633,
+          "py": 1401.3754556500605,
+          "dx": "1000",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 924.3535844471445,
+          "py": 1076.7630619684082,
+          "dx": "100000000",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 104.9052247873633,
+          "py": 556.1956257594168,
+          "dx": "1000",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 106.88456865127581,
+          "py": 162.30619684082623,
+          "dx": "100000000",
+          "dy": "120",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "N_f - Maximum Stress (ksi) (A = 0.67)",
+      "type": "XYAxes",
+      "isLogX": true,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 105.38173349534225,
+          "py": 1406.617051437829,
+          "dx": "1000",
+          "dy": "20",
+          "dz": null
+        },
+        {
+          "px": 923.2356217091941,
+          "py": 1077.8718610773594,
+          "dx": "100000000",
+          "dy": "20",
+          "dz": null
+        },
+        {
+          "px": 983.0741190765491,
+          "py": 816.4793438639124,
+          "dx": "1000",
+          "dy": "20",
+          "dz": null
+        },
+        {
+          "px": 984.7235722964763,
+          "py": 555.8657351154313,
+          "dx": "100000000",
+          "dy": "100",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "N_f - Maximum Stress (ksi) (A = 0.25",
+      "type": "XYAxes",
+      "isLogX": true,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 105.56500607533414,
+          "py": 1403.6846901579586,
+          "dx": "1000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 923.6938031591736,
+          "py": 1077.0929526123937,
+          "dx": "100000000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 107.21445929526124,
+          "py": 1078.7424058323206,
+          "dx": "1000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 107.21445929526124,
+          "py": 816.4793438639124,
+          "dx": "100000000",
+          "dy": "120",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

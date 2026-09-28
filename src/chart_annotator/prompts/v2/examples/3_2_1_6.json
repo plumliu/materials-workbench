@@ -1,0 +1,166 @@
+{
+  "figure_id": "3.2.1.6",
+  "tasks": [
+    "axes",
+    "axes-repair"
+  ],
+  "image": "fig_3_2_1_6.png",
+  "source_ids": [
+    "sha256:06a06925d149d92cb9eb75a1b3eefb6eee04852e8b8f8cee1aed0dda8b511d52"
+  ],
+  "selection_cues": [
+    "Frequency",
+    "frequency distribution"
+  ],
+  "lesson": "Four spatially separate coordinate frames, four independent mappings and exactly one curved distribution boundary per frame. Fill and the straight zero-frequency axis are not datasets. Axis labels and units retain lowercase percent.",
+  "input": {
+    "visible_text": [
+      "Frequency",
+      "Fty",
+      "Ftu",
+      "RA",
+      "e"
+    ]
+  },
+  "output": {
+    "axes": [
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_6_axis_0",
+        "display_name": "Frequency (percent) - Fty (ksi)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Frequency",
+        "y_label": "Fty",
+        "x_unit": "percent",
+        "y_unit": "ksi",
+        "categories": [],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_6_axis_1",
+        "display_name": "Frequency (percent) - Ftu (ksi)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Frequency",
+        "y_label": "Ftu",
+        "x_unit": "percent",
+        "y_unit": "ksi",
+        "categories": [],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_6_axis_2",
+        "display_name": "Frequency (percent) - RA (percent)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Frequency",
+        "y_label": "RA",
+        "x_unit": "percent",
+        "y_unit": "percent",
+        "categories": [],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_6_axis_3",
+        "display_name": "Frequency (percent) - e (percent)",
+        "axis_type": "xy",
+        "x_scale": "linear",
+        "y_scale": "linear",
+        "x_label": "Frequency",
+        "y_label": "e",
+        "x_unit": "percent",
+        "y_unit": "percent",
+        "categories": [],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      }
+    ],
+    "datasets": [
+      {
+        "axis_id": "ex_3_2_1_6_axis_0",
+        "display_name": "Fty | solid frequency distribution boundary",
+        "kind": "distribution_boundary"
+      },
+      {
+        "axis_id": "ex_3_2_1_6_axis_1",
+        "display_name": "Ftu | solid frequency distribution boundary",
+        "kind": "distribution_boundary"
+      },
+      {
+        "axis_id": "ex_3_2_1_6_axis_2",
+        "display_name": "RA | solid frequency distribution boundary",
+        "kind": "distribution_boundary"
+      },
+      {
+        "axis_id": "ex_3_2_1_6_axis_3",
+        "display_name": "e | solid frequency distribution boundary",
+        "kind": "distribution_boundary"
+      }
+    ]
+  },
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Frequency (percent)",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "Fty (ksi)",
+            "scale": "linear"
+          }
+        ]
+      },
+      {
+        "x": {
+          "name": "Frequency (percent)",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "Ftu (ksi)",
+            "scale": "linear"
+          }
+        ]
+      },
+      {
+        "x": {
+          "name": "Frequency (percent)",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "RA (percent)",
+            "scale": "linear"
+          }
+        ]
+      },
+      {
+        "x": {
+          "name": "Frequency (percent)",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "e (percent)",
+            "scale": "linear"
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "axis_lesson": "Return four groups even though every X is named Frequency (percent): Fty, Ftu, RA and e occupy spatially separate coordinate frames and each needs its own grounding anchors. Do not output frame IDs or coordinates during Axis planning."
+}

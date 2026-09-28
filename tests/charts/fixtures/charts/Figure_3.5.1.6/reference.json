@@ -1,0 +1,48 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.5.1.6",
+  "source_tar_sha256": "db0feb738f28c5e811e3d76efab6fefba7b7ef3bea25f55b5329e9d4277ec002",
+  "axis_count": 1,
+  "dataset_count": 6,
+  "known_difficulty": "Marker type, specimen source and inclusion slash distinguish observations; curves separate.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "N_f - Maximum Stress (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 118.99488926746169,
+          "py": 931.6758943781944,
+          "dx": "1000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 1171.0178875638842,
+          "py": 930.3236797274277,
+          "dx": "10000000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 118.9948892674617,
+          "py": 931.6758943781944,
+          "dx": "1000",
+          "dy": "40",
+          "dz": null
+        },
+        {
+          "px": 118.99488926746169,
+          "py": 413.7776831345827,
+          "dx": "10000000",
+          "dy": "80",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

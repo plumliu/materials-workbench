@@ -1,0 +1,59 @@
+{
+  "figure_id": "3.2.1.10",
+  "tasks": [
+    "axes",
+    "axes-repair"
+  ],
+  "image": "fig_3_2_1_10.png",
+  "source_ids": [
+    "sha256:02c00423b4c56b1c2ce27ae34e6ac73d56d6f5c86ea48b7fb5a47d01b14ec7ec"
+  ],
+  "selection_cues": [
+    "1750F",
+    "1850F",
+    "age, 8 hrs",
+    "Aging Temperature"
+  ],
+  "input": {
+    "visible_text": [
+      "1750F, 1 hr, WQ + age, 8 hrs, AC",
+      "1850F, 1 hr, WQ + age, 8 hrs, AC",
+      "Aging Temperature - F",
+      "Ftu",
+      "Fty",
+      "RA",
+      "e(1 in.)"
+    ]
+  },
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Aging Temperature - F",
+          "scale": "linear"
+        },
+        "ys": [
+          {
+            "name": "Ftu (ksi)",
+            "scale": "linear"
+          },
+          {
+            "name": "Fty (ksi)",
+            "scale": "linear"
+          },
+          {
+            "name": "RA (Percent)",
+            "scale": "linear"
+          },
+          {
+            "name": "e(1 in.) (Percent)",
+            "scale": "linear"
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "axis_lesson": "One shared linear Aging Temperature - F X. Four visibly separate linear Y mappings: Ftu (ksi), Fty (ksi), RA (Percent), and e(1 in.) (Percent). Do not split properties beyond their actual tick mapping."
+}

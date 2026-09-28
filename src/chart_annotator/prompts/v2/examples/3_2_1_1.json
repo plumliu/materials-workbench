@@ -1,0 +1,230 @@
+{
+  "figure_id": "3.2.1.1",
+  "image": "fig_3_2_1_1.png",
+  "source_ids": [
+    "sha256:3a8c568c1dce9b1fdd7ac5ea050abefe78284088d23062512d1a5e9ee8beada5"
+  ],
+  "selection_cues": [
+    "As Rec'd",
+    "Anneal Temperature",
+    "Ftu",
+    "Fty",
+    "Elements PPM"
+  ],
+  "tasks": [
+    "axes",
+    "axes-repair",
+    "binding"
+  ],
+  "input": {
+    "visible_text": [
+      "As Rec'd",
+      "1400 1500 1600",
+      "Anneal Temperature (F)",
+      "Ftu (ksi)",
+      "Fty (ksi)",
+      "RA e (1 in.) Percent"
+    ]
+  },
+  "axis_lesson": "The break isolates the exceptional As Rec'd state; 1400, 1500 and 1600 are an ordered numerical anneal-temperature segment, so X is linear rather than categorical. Ftu uses the left upper mapping, Fty the right upper mapping, and RA/e the lower Percent mapping. They require three Y entries because their spines, origins or ranges differ.",
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Anneal Temperature (F)",
+          "scale": "linear",
+          "categories": []
+        },
+        "ys": [
+          {
+            "name": "Ftu (ksi)",
+            "scale": "linear",
+            "categories": []
+          },
+          {
+            "name": "Fty (ksi)",
+            "scale": "linear",
+            "categories": []
+          },
+          {
+            "name": "RA/e (1 in.) (Percent)",
+            "scale": "linear",
+            "categories": []
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "binding_lesson": "The right-side Fty numbers are printed to the right of the plotting frame. Their grounding x is the dark right spine at 561/657 = 854/1000, not the number box near 890-921/1000. The As Rec'd state is left of a break and is not a numerical calibration anchor; use 1400, 1500 and 1600 on the numerical segment. All coordinates below are normalized from the complete 657 by 941 image.",
+  "binding_input": {
+    "structure": {
+      "groups": [
+        {
+          "x": {
+            "name": "Anneal Temperature (F)",
+            "scale": "linear"
+          },
+          "ys": [
+            {
+              "name": "Ftu (ksi)",
+              "scale": "linear"
+            },
+            {
+              "name": "Fty (ksi)",
+              "scale": "linear"
+            },
+            {
+              "name": "RA/e (1 in.) (Percent)",
+              "scale": "linear"
+            }
+          ]
+        }
+      ]
+    },
+    "image_size": [
+      657,
+      941
+    ]
+  },
+  "binding_output": {
+    "schema_version": "grounding/v3",
+    "coordinate_system": "normalized_0_1000",
+    "groups": [
+      {
+        "x": [
+          {
+            "visible_label": "1400",
+            "value": 1400.0,
+            "point_2d": [
+              401.83,
+              756.64
+            ]
+          },
+          {
+            "visible_label": "1500",
+            "value": 1500.0,
+            "point_2d": [
+              627.09,
+              756.64
+            ]
+          },
+          {
+            "visible_label": "1600",
+            "value": 1600.0,
+            "point_2d": [
+              853.88,
+              756.64
+            ]
+          }
+        ],
+        "ys": [
+          [
+            {
+              "visible_label": "160",
+              "value": 160.0,
+              "point_2d": [
+                178.08,
+                36.13
+              ]
+            },
+            {
+              "visible_label": "140",
+              "value": 140.0,
+              "point_2d": [
+                178.08,
+                138.15
+              ]
+            },
+            {
+              "visible_label": "120",
+              "value": 120.0,
+              "point_2d": [
+                178.08,
+                242.3
+              ]
+            },
+            {
+              "visible_label": "100",
+              "value": 100.0,
+              "point_2d": [
+                178.08,
+                345.38
+              ]
+            }
+          ],
+          [
+            {
+              "visible_label": "160",
+              "value": 160.0,
+              "point_2d": [
+                853.88,
+                138.15
+              ]
+            },
+            {
+              "visible_label": "140",
+              "value": 140.0,
+              "point_2d": [
+                853.88,
+                242.3
+              ]
+            },
+            {
+              "visible_label": "120",
+              "value": 120.0,
+              "point_2d": [
+                853.88,
+                345.38
+              ]
+            },
+            {
+              "visible_label": "100",
+              "value": 100.0,
+              "point_2d": [
+                853.88,
+                449.52
+              ]
+            }
+          ],
+          [
+            {
+              "visible_label": "60",
+              "value": 60.0,
+              "point_2d": [
+                178.08,
+                449.52
+              ]
+            },
+            {
+              "visible_label": "40",
+              "value": 40.0,
+              "point_2d": [
+                178.08,
+                551.54
+              ]
+            },
+            {
+              "visible_label": "20",
+              "value": 20.0,
+              "point_2d": [
+                178.08,
+                655.69
+              ]
+            },
+            {
+              "visible_label": "0",
+              "value": 0.0,
+              "point_2d": [
+                178.08,
+                756.64
+              ]
+            }
+          ]
+        ]
+      }
+    ],
+    "unresolved": []
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:4886b7c5b97ee4d72eeea07a0653fbfa11cb07e0ece16b0f2fc1fd7a00cd7079",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 18,
+    "figure_id": "3.3.1.3",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "Test Temperature (F) - Ftu (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "Test Temperature (F) - Fty (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_3",
+      "display_name": "Test Temperature (F) - e (1 in) (Percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | Flange + Web | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | Flange + Web | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | Base | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | Base | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_2",
+      "display_name": "Fty | Base | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_2",
+      "display_name": "Fty | Base | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_7",
+      "axis_id": "axis_2",
+      "display_name": "Fty | Flange + Web | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_8",
+      "axis_id": "axis_2",
+      "display_name": "Fty | Flange + Web | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_9",
+      "axis_id": "axis_3",
+      "display_name": "e (1 in) | Base | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_10",
+      "axis_id": "axis_3",
+      "display_name": "e (1 in) | Base | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_11",
+      "axis_id": "axis_3",
+      "display_name": "e (1 in) | Flange + Web | solid upper boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_12",
+      "axis_id": "axis_3",
+      "display_name": "e (1 in) | Flange + Web | solid lower boundary",
+      "kind": "range_boundary",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

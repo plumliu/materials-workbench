@@ -1,0 +1,55 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.2.1.7",
+  "source_tar_sha256": "e8eb3dfb8c92aec6df76ebb3356271ba50e22ab52b9152bdf759f6f9ea37452f",
+  "axis_count": 2,
+  "dataset_count": 8,
+  "known_difficulty": "Two categorical scatter axes; shared physical tick has 110 and 30; categories A-E.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "Master Heats - Ftu/Fty (ksi)",
+      "type": "BarAxes",
+      "isLog": false,
+      "isRotated": false,
+      "calibrationPoints": [
+        {
+          "px": 112.98141891891893,
+          "py": 559.1131756756757,
+          "dx": 0,
+          "dy": "110",
+          "dz": null
+        },
+        {
+          "px": 112.98141891891893,
+          "py": 262.1748310810811,
+          "dx": 0,
+          "dy": "140",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Master Heats - RA/e (1 in) (Percent)",
+      "type": "BarAxes",
+      "isLog": false,
+      "isRotated": false,
+      "calibrationPoints": [
+        {
+          "px": 112.98141891891893,
+          "py": 856.0515202702703,
+          "dx": 0,
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 114.42989864864866,
+          "py": 560.5616554054054,
+          "dx": 0,
+          "dy": "30",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

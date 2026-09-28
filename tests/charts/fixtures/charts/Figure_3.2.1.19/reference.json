@@ -1,0 +1,55 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.2.1.19",
+  "source_tar_sha256": "5743884959f7ac9a4166df98576c0f941a79aed8aa935a0b624d2b06c3f5aa1e",
+  "axis_count": 2,
+  "dataset_count": 10,
+  "known_difficulty": "Categorical bars with strength and ductility scales; no invented category points.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "Property - Strength (ksi)",
+      "type": "BarAxes",
+      "isLog": false,
+      "isRotated": false,
+      "calibrationPoints": [
+        {
+          "px": 108.2331081081081,
+          "py": 642.0608108108107,
+          "dx": 0,
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 108.2331081081081,
+          "py": 40.358108108108105,
+          "dx": 0,
+          "dy": "150",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Property - Ductility (percent)",
+      "type": "BarAxes",
+      "isLog": false,
+      "isRotated": false,
+      "calibrationPoints": [
+        {
+          "px": 974.0979729729729,
+          "py": 640.2263513513512,
+          "dx": 0,
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 974.0979729729729,
+          "py": 333.8716216216216,
+          "dx": 0,
+          "dy": "30",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

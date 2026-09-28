@@ -1,0 +1,117 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:06a06925d149d92cb9eb75a1b3eefb6eee04852e8b8f8cee1aed0dda8b511d52",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 13,
+    "figure_id": "3.2.1.6",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "Frequency (percent) - Fty (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "Frequency (percent) - Ftu (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_3",
+      "display_name": "Frequency (percent) - RA (percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_4",
+      "display_name": "Frequency (percent) - e (percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "Fty | solid frequency distribution boundary",
+      "kind": "distribution_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_2",
+      "display_name": "Ftu | solid frequency distribution boundary",
+      "kind": "distribution_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_3",
+      "display_name": "RA | solid frequency distribution boundary",
+      "kind": "distribution_boundary",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_4",
+      "display_name": "e | solid frequency distribution boundary",
+      "kind": "distribution_boundary",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

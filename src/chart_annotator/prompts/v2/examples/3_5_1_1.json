@@ -1,0 +1,69 @@
+{
+  "figure_id": "3.5.1.1",
+  "tasks": [
+    "axes",
+    "axes-repair"
+  ],
+  "image": "fig_3_5_1_1.png",
+  "source_ids": [
+    "sha256:99f91854d1d7d7b8a4035949e67b0a04ec380261db7f82b065efe488e2a956f2"
+  ],
+  "selection_cues": [
+    "Smooth",
+    "Notch",
+    "Heat",
+    "0.67",
+    "0.25"
+  ],
+  "input": {
+    "visible_text": [
+      "A = ∞ | Smooth | Heat A",
+      "A = ∞ | Smooth | Heat B",
+      "A = ∞ | Smooth",
+      "A = ∞ | Notch | Heat A",
+      "A = ∞ | Notch | Heat B",
+      "A = ∞ | Notch",
+      "A = 0.67 | Smooth | Heat A",
+      "A = 0.67 | Smooth | Heat B",
+      "A = 0.67 | Smooth",
+      "A = 0.67 | Notch | Heat A",
+      "A = 0.67 | Notch | Heat B",
+      "A = 0.67 | Notch",
+      "A = 0.25 | Smooth | Heat A",
+      "A = 0.25 | Smooth | Heat B",
+      "A = 0.25 | Smooth",
+      "A = 0.25 | Notch | Heat A",
+      "A = 0.25 | Notch | Heat B",
+      "A = 0.25 | Notch",
+      "N_f",
+      "Maximum Stress"
+    ]
+  },
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "N_f",
+          "scale": "log"
+        },
+        "ys": [
+          {
+            "name": "Maximum Stress (ksi) (A = ∞)",
+            "scale": "linear"
+          },
+          {
+            "name": "Maximum Stress (ksi) (A = 0.67)",
+            "scale": "linear"
+          },
+          {
+            "name": "Maximum Stress (ksi) (A = 0.25)",
+            "scale": "linear"
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "axis_lesson": "One shared logarithmic N_f X spans the frame. The three vertically arranged A conditions have distinct linear Maximum Stress mappings, so return three Y entries with their visible A qualifiers."
+}

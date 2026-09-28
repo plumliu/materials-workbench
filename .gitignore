@@ -1,6 +1,9 @@
+# Local configuration; commit only the empty example.
 .env
 .env.*
 !.env.example
+
+# Environments, caches and build products.
 .venv/
 __pycache__/
 *.py[cod]
@@ -11,10 +14,17 @@ build/
 dist/
 node_modules/
 .research/
-pdfs/
-figure_assets/
-runs/
+
+# Keep the workspace layout without committing manual data or results.
+/pdfs/*
+!/pdfs/.gitkeep
+/figure_assets/*
+!/figure_assets/.gitkeep
+/runs/*
+!/runs/.gitkeep
+/library/*
+!/library/.gitkeep
+
 outputs/
-library/
 *.sqlite
 *.sqlite-*

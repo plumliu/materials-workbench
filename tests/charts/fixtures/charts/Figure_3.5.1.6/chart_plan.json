@@ -1,0 +1,90 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:90c1321702aa1f9ed9577cc72ff5552b111c18ebcc6d876ffc5aa05f8d9ede3a",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 33,
+    "figure_id": "3.5.1.6",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "N_f - Maximum Stress (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "(A) Annealed | 10 lbs castings from Manufacturer No. 1 | open triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "(B) Solution Treat + Age | 10 lbs castings from Manufacturer No. 1 | filled triangle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_1",
+      "display_name": "(B) Solution Treat + Age | 10 lbs castings from Manufacturer No. 1 | filled triangle with diagonal slash | Inclusion observed",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_1",
+      "display_name": "(B) Solution Treat + Age | 1-lb casting from Manufacturer No. 2 | filled circle",
+      "kind": "scatter",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_1",
+      "display_name": "upper solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_1",
+      "display_name": "lower solid fatigue curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}

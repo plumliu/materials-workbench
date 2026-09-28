@@ -1,0 +1,898 @@
+{
+  "schema_version": "manual-manifest/v1",
+  "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+  "source_pdf": "Ti-6V-4V(Cast).pdf",
+  "page_count": 75,
+  "figure_job_count": 33,
+  "provenance": "Manual intake audit 2026-09-14; independently reviewed PDF blocks and OCR",
+  "pages": [
+    {
+      "source_page": 1,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 2,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 3,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 4,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 5,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 6,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 7,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 8,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.1",
+          "caption": "Figure 3.2.1.1 Typical stress-strain curves for annealed cast ring segments from two heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.374,
+            409.412,
+            237.603,
+            431.302
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 9,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.10",
+          "caption": "Figure 3.2.1.10 Effect of solution treat and aging temperatures on tensile properties of cast compressor casings (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            19.931,
+            346.349,
+            281.327,
+            368.237
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 10,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.11",
+          "caption": "Figure 3.2.1.11 Effect of aging temperatures on tensile properties of three compressor casings cast from one heat (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.948,
+            320.825,
+            203.342,
+            353.711
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 11,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.12",
+          "caption": "Figure 3.2.1.12 Effect of oxygen content on tensile properties of annealed cast-to-size specimens (Ref. 9)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.222,
+            243.889,
+            271.975,
+            265.777
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 12,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.19",
+          "caption": "Figure 3.2.1.19 Effect of thermal treatment on the 70F tensile properties of cast and HIP‘ed Ti-6Al-4V alloy and the wrought alloy (Ref. 32)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            9.677,
+            388.1,
+            340.076,
+            409.99
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 13,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.6",
+          "caption": "Figure 3.2.1.6 Frequency distribution of tensile properties of hot isostatically pressed and annealed T1-6Al-4V casting test bars from 500 heats (Ref. 24)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.905,
+            566.795,
+            326.526,
+            588.68
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 14,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.7",
+          "caption": "Figure 3.2.1.7 Variation in tensile properties of five master heats for the as-cast and annealed conditions (Ref. 9)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.487,
+            328.25,
+            333.213,
+            350.141
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 15,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.2.1.9",
+          "caption": "Figure 3.2.1.9 Effect of solution treat temperatures on tensile properties of solution treated and aged cast-to- size specimens (Ref. 9)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            4.527,
+            247.999,
+            219.283,
+            280.88
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 16,
+      "figure_status": "detected",
+      "text_layer_available": false,
+      "figures": [
+        {
+          "figure_id": "3.3.1.1",
+          "caption": "Figure 3.3.1.1 Effect of test temperatures on tensile properties of five annealed cast compressor casings from three heats (Ref. 4)",
+          "caption_source": "rapidocr_full_page",
+          "caption_bbox_pdf": [
+            9.5,
+            449.0,
+            219.5,
+            483.5
+          ],
+          "caption_bbox_px": [
+            19.0,
+            898.0,
+            439.0,
+            967.0
+          ],
+          "ocr_render_size": [
+            519,
+            985
+          ]
+        }
+      ]
+    },
+    {
+      "source_page": 17,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.2",
+          "caption": "Figure 3.3.1.2 Effect of test temperatures on tensile properties of specimens machined from annealed cast compressor casings and annealed cast-to-size specimens each from two heats (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.288,
+            436.394,
+            244.808,
+            480.282
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 18,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.3",
+          "caption": "Figure 3.3.1.3 Effect of test temperatures on tensile properties of annealed cast ring segments from two heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.572,
+            538.944,
+            350.366,
+            560.831
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 19,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.5",
+          "caption": "Figure 3.3.1.5 Effects of test temperature on ultimate tensile strength of standard composition and extra low interstitials casings (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.288,
+            416.083,
+            290.204,
+            437.971
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 20,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.1.6",
+          "caption": "Figure 3.3.1.6 Effects of test temperature on percent elongation of standard composition and extra low interstitials casings (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.97,
+            441.509,
+            317.379,
+            463.395
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 21,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.3.7.1.2",
+          "caption": "Figure 3.3.7.1.2 Effects of test temperature on the fracture toughness of standard composition and extra low interstitials casings (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            12.477,
+            344.266,
+            272.568,
+            364.662
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 22,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.4.4",
+          "caption": "Figure 3.4.4 Stress reputure curves at 700, 800 and 900F for specimens machined from five annealed cast compressor casings from three heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.356,
+            372.957,
+            300.26,
+            405.843
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 23,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.4.6",
+          "caption": "Figure 3.4.6 Stress reputure curves at 700, 800, and 900F for specimens machined from cast compressor casing aged at 1000F (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.546,
+            370.833,
+            259.735,
+            403.719
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 24,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.1",
+          "caption": "Figure 3.5.1.1 High-cycle axial fatigue results at 500F for annealed smooth and mild-notch cast-to-size specimens from two heats (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            12.889,
+            510.624,
+            329.744,
+            532.512
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 25,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.10",
+          "caption": "Figure 3.5.1.10 Comparison of average fatigue life curves for eight conditions (Ref. 31)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            21.094,
+            225.953,
+            289.639,
+            247.841
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 26,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.11",
+          "caption": "Figure 3.5.1.11 Effects of thermal treatment on the 70F HCF life of cast and HIP’ed Ti-6Al-4V alloy (Ref. 32)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.042,
+            248.649,
+            314.835,
+            270.53
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 27,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.12",
+          "caption": "Figure 3.5.1.12 Open-hole fatigue data comparing beta annealed (BA) to mill annealed (MA) (Ref. 34)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.896,
+            377.957,
+            326.792,
+            399.84
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 28,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.13",
+          "caption": "Figure 3.5.1.13 Strain-life fatigue data comparing beta annealed material to standard mill annealed condition (Ref. 34)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            55.766,
+            491.566,
+            396.695,
+            513.453
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 29,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.2",
+          "caption": "Figure 3.5.1.2 150 hours, 500F stress range diagram for smooth and mild-notch cast-to-size specimens from two heats (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.865,
+            340.941,
+            376.482,
+            362.827
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 30,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.3",
+          "caption": "Figure 3.5.1.3 Room temperature axial load fatigue properties of smooth specimens from five heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            16.283,
+            414.053,
+            443.0,
+            424.941
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 31,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.4",
+          "caption": "Figure 3.5.1.4 Room temperature axial load fatigue properties of mild-notch specimens from five annealed cast ring segments from two heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.573,
+            346.383,
+            407.243,
+            368.273
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 32,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.5",
+          "caption": "Figure 3.5.1.5 Room temperature smooth fatigue properties of annealed and solution treated and aged castings (Ref. 8)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            15.83,
+            292.661,
+            388.573,
+            314.544
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 33,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.6",
+          "caption": "Figure 3.5.1.6 Room temperature mild-notch fatigue properties of annealed and solution treated and aged castings from two casting manufacturers (Ref. 8)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.926,
+            352.506,
+            405.021,
+            374.389
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 34,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.8",
+          "caption": "Figure 3.5.1.8 HCF data for annealed investment cast Ti-6Al-4V test bars (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            18.6,
+            314.682,
+            344.475,
+            325.571
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 35,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.1.9",
+          "caption": "Figure 3.5.1.9 HCF data for investment cast Ti-6Al-4V test bars in the beta solution treated and aged condition (Ref. 28)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            17.368,
+            356.035,
+            350.545,
+            377.923
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 36,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.2.1",
+          "caption": "Figure 3.5.2.1 Low-cycle axial fatigue results at 500F for annealed mild-notch specimens cast-to-size from two heats (Ref. 4)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.937,
+            387.064,
+            369.821,
+            408.954
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 37,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.1",
+          "caption": "Figure 3.5.3.1 Fatigue crack-growth comparison (Ref. 26)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            12.341,
+            269.664,
+            241.086,
+            280.553
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 38,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.2",
+          "caption": "Figure 3.5.3.2 Crack-growth rate of Ti-6Al-4V mill annealed casting with no weld repair (Ref. 34)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            13.267,
+            352.129,
+            217.179,
+            374.017
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 39,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.5.3.3",
+          "caption": "Figure 3.5.3.3 Crack-growth rate of weld repaired Ti-6Al-4V mill annealed casting (Ref. 34)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            11.482,
+            367.19,
+            214.243,
+            389.076
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 40,
+      "figure_status": "detected",
+      "text_layer_available": true,
+      "figures": [
+        {
+          "figure_id": "3.6.2.1",
+          "caption": "Figure 3.6.2.1 Effects of test temperature on tensile elastic modulus of elasticity of annealed cast ring segments from two heats (Ref. 5)",
+          "caption_source": "pdf_text_layer",
+          "caption_bbox_pdf": [
+            14.51,
+            419.226,
+            399.597,
+            441.116
+          ],
+          "caption_bbox_px": null
+        }
+      ]
+    },
+    {
+      "source_page": 41,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 42,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 43,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 44,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 45,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 46,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 47,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 48,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 49,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 50,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 51,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 52,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 53,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 54,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 55,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 56,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 57,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 58,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 59,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 60,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 61,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 62,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 63,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 64,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 65,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 66,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 67,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 68,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 69,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 70,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 71,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 72,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 73,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 74,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    },
+    {
+      "source_page": 75,
+      "figure_status": "non_figure",
+      "text_layer_available": true,
+      "figures": []
+    }
+  ]
+}

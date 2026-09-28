@@ -1,0 +1,144 @@
+{
+  "figure_id": "3.2.1.7",
+  "tasks": [
+    "axes",
+    "axes-repair"
+  ],
+  "image": "fig_3_2_1_7.png",
+  "source_ids": [
+    "sha256:cb9abdb5fc755602b91c98451fb394438f46e01145b41bda17412fbaf452014f"
+  ],
+  "selection_cues": [
+    "Master Heats",
+    "As-Cast",
+    "Argon"
+  ],
+  "lesson": "Two numeric mappings, not four properties-as-axes. Eight property x condition observation datasets. Categories A-E are not numeric. Full anneal text and fill distinguish names. No printed trend curve. The full Annealed treatment applies to all four property series across both Axes; every Annealed Dataset name repeats the treatment, while As-Cast series do not inherit it.",
+  "input": {
+    "visible_text": [
+      "As-Cast",
+      "Annealed: 1300F, 2hrs in Argon, AC",
+      "Master Heats",
+      "Ftu/Fty",
+      "RA/e (1 in)"
+    ]
+  },
+  "output": {
+    "axes": [
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_7_axis_0",
+        "display_name": "Master Heats - Ftu/Fty (ksi)",
+        "axis_type": "categorical_x_numeric_y",
+        "x_scale": "categorical",
+        "y_scale": "linear",
+        "x_label": "Master Heats",
+        "y_label": "Ftu/Fty",
+        "x_unit": null,
+        "y_unit": "ksi",
+        "categories": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "shared_x_axis_id": null,
+        "calibration": {}
+      },
+      {
+        "schema_version": "axis-plan/v2",
+        "id": "ex_3_2_1_7_axis_1",
+        "display_name": "Master Heats - RA/e (1 in) (Percent)",
+        "axis_type": "categorical_x_numeric_y",
+        "x_scale": "categorical",
+        "y_scale": "linear",
+        "x_label": "Master Heats",
+        "y_label": "RA/e (1 in)",
+        "x_unit": null,
+        "y_unit": "Percent",
+        "categories": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "shared_x_axis_id": "ex_3_2_1_7_axis_0",
+        "calibration": {}
+      }
+    ],
+    "datasets": [
+      {
+        "axis_id": "ex_3_2_1_7_axis_0",
+        "display_name": "Ftu | As-Cast | open circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_0",
+        "display_name": "Ftu | Annealed: 1300F, 2hrs in Argon, AC | filled circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_0",
+        "display_name": "Fty | As-Cast | open circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_0",
+        "display_name": "Fty | Annealed: 1300F, 2hrs in Argon, AC | filled circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_1",
+        "display_name": "RA | As-Cast | open circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_1",
+        "display_name": "RA | Annealed: 1300F, 2hrs in Argon, AC | filled circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_1",
+        "display_name": "e (1 in) | As-Cast | open circle",
+        "kind": "scatter"
+      },
+      {
+        "axis_id": "ex_3_2_1_7_axis_1",
+        "display_name": "e (1 in) | Annealed: 1300F, 2hrs in Argon, AC | filled circle",
+        "kind": "scatter"
+      }
+    ]
+  },
+  "axis_output": {
+    "schema_version": "axis-structure/v3",
+    "groups": [
+      {
+        "x": {
+          "name": "Master Heats",
+          "scale": "categorical",
+          "categories": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ]
+        },
+        "ys": [
+          {
+            "name": "Ftu/Fty (ksi)",
+            "scale": "linear"
+          },
+          {
+            "name": "RA/e (1 in) (Percent)",
+            "scale": "linear"
+          }
+        ]
+      }
+    ],
+    "unresolved": []
+  },
+  "axis_lesson": "One categorical Master Heats X with A-E in visible order. Ftu and Fty share one ksi mapping, while RA and e (1 in) share one Percent mapping, so return two Y entries."
+}

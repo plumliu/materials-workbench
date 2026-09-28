@@ -1,110 +1,75 @@
-# 整合调研与实现方案
+# 架构与产物
 
-## 当前结论与边界
+## 处理边界
 
-可行，整体难度中等。两套 Python 代码的依赖兼容，资产格式已经衔接；主要工作是统一文件位置、连接内嵌 WPD 的导入与保存，以及保护人工修订。当前阶段完成环境初始化和兼容验证，业务迁移与网页功能将在方案讨论后实施。
-
-调研来源：
-
-| 项目 | 本地路径或来源 | 本次版本 |
-| --- | --- | --- |
-| 图像准备 | `C:/python_workspace/chart-annotator` | `95c2813` |
-| 表格与组装 | `C:/Users/plumlocal/Desktop/plot/plot-workflow` | `8b3d0cb` |
-| WebPlotDigitizer | [官方仓库](https://github.com/automeris-io/WebPlotDigitizer) | 5.3，`3a3ecb11606945d0701c8a488777e6861be70056` |
-
-原两个仓库保持独立，迁入代码时以这些版本为基线，并保留现有测试。
-
-## 已核实的连接点
-
-`chart-annotator` 的 intake 生成完整 `_page_review/` 与各 Figure 的单页 PDF；`run-manual --datasets` 在 Figure 目录添加带图像、已标定坐标轴和空 Dataset 的 TAR。这与下游当前接收的 Figure 资产格式一致，可以直接把上游输出位置设为 `figure_assets/`。
-
-上游仍由 LangGraph 调用 `.env` 中配置的视觉模型；下游仍由 Codex 运行 MinerU 并派发 Luna 子代理。两套 Python 包可以暂时保持各自模块名，统一安装和启动，不需要重新实现算法或统一成一个代理框架。
-
-WPD 5.3 的 `saveResume.readProjectFile(file)` 可读取 TAR；`PlotData.deserialize()` 仍支持版本主号 4，`serialize()` 仍输出 `[4, 2]`。现有坐标轴、Dataset 归属、点组名称和标注元数据有对应字段。参见 [官方载入与保存代码](https://github.com/automeris-io/WebPlotDigitizer/blob/3a3ecb11606945d0701c8a488777e6861be70056/javascript/services/saveResume.js) 与 [项目数据代码](https://github.com/automeris-io/WebPlotDigitizer/blob/3a3ecb11606945d0701c8a488777e6861be70056/javascript/core/plotData.js)。
-
-现有组装器只判断 Figure TAR 是否可读、是否含文件，不知道人工是否完成采点。统一网页需要记录明确的人工标注状态，不能把“已有空 TAR”等同于“已完成”。
-
-## 网页与保存方式
-
-一个只监听本机的 Python 服务提供两个页面入口：图像标注、表格核验。继续使用现有普通 HTML/CSS/JavaScript；复用表格界面的列表、搜索、拖动分隔线和状态显示。
-
-图像页的左栏按物理页列出 Figure，同一页有多个 Figure 时各自是一个条目。工作区提供原 PDF 预览和内嵌 WPD；原页预览可收起，分隔线可拖动，让 WPD 有足够操作空间。选择 Figure 时自动载入对应 TAR，优先打开人工已保存的版本。
-
-WPD 源码在本地作为静态页面提供，和外层页面使用同一来源。通过小范围连接代码完成准备就绪、载入、保存结果和错误反馈。现有导入函数没有返回完整的异步完成结果，需要补齐这一点，避免快速切图时显示上一张图的迟到结果。
-
-保存时使用 WPD 当前序列化数据及当前图像文件生成完整 TAR，经本地 API 校验后原子替换 Figure 资产目录中的当前 TAR。保留“保存”和“确认标注”两个含义；切图或关页前处理未保存修改。版本号用于拒绝旧页面覆盖新保存结果。
-
-必须使用 TAR 内原有图像继续采点。另行把 PDF 按不同分辨率渲染后替换这张图，会改变像素坐标和标定的对应关系。原 PDF 预览可以独立渲染。
-
-表格页延续当前稀疏人工修订的行为：编辑单元格、核对全部来源页、保存草稿、确认核验，组装时应用已确认内容。
-
-## 中间产物的目标排布
-
-保持用户已有的 `pdfs/`、`figure_assets/`、`runs/`、`library/` 四个入口：
-
-```text
-materials-workbench/
-├── pdfs/<手册名>.pdf
-├── figure_assets/<手册名>/
-│   ├── _page_review/page_####.pdf
-│   └── Figure_<编号>/
-│       ├── Figure_<编号>.pdf
-│       └── Figure_<编号>.tar          # 当前可继续编辑、可组装的版本
-├── runs/<手册名>/
-│   ├── manual.json                   # 来源页映射与处理状态
-│   ├── figures/Figure_<编号>/         # 本图计划、必要证据、自动生成的原始 TAR
-│   │   └── review.json               # 人工标注状态与保存版本
-│   └── tables/
-│       ├── ocr/<片段编号>/            # 原始 OCR 结果，每个片段一份
-│       ├── index.json                # 表编号、页码、状态及位置的简要索引
-│       └── Table_<编号>/
-│           ├── candidate.json        # 当前机器/Luna 表格内容
-│           ├── table.xlsx
-│           ├── luna_patch.json       # 确有 Luna 修订时存在
-│           └── human_review.json     # 有人工记录时存在
-└── library/<手册名>/                  # 最终组装成品
+```mermaid
+flowchart TD
+    A[网页 intake] --> B[来源单页与 Figure 页码映射]
+    B --> C[Codex 跟进 LangGraph Axes / Datasets]
+    B --> D[MinerU OCR 与规则检查]
+    C --> E[逐图开放 WPD 人工标注]
+    D --> F[必要的 Codex Luna 复查]
+    F --> G[逐逻辑表开放人工核验]
+    E --> H[网页组装 library]
+    G --> H
 ```
 
-这是待实施的目标结构，不是当前两个旧仓库已迁移后的状态。
+同一物理页可以同时含 Figure 和 Table；混合页进入两条支线。跨页表的片段在表格支线内归并，人工核验的单位是完整逻辑表。Luna 仍由 Codex 主代理派发 `gpt-6-luna`、`xhigh`，网页不运行额外代理调度器。
 
-- 图像运行不再以随机目录嵌套随机目录；每张图的计划、证据和失败 checkpoint 留在该图固定目录。只有失败或中断的任务需要保留恢复 checkpoint。
-- 表格不再随着 `machine_validated`、`review_queue`、`luna_reviewed` 状态变化复制整套目录。状态在索引中改变，表的固定目录保持不变；同页多组件仍归属一张逻辑表。
-- 图像自动生成的原始 TAR 和人工当前 TAR 各保留一份，分别用于重置/比较与继续编辑。重跑模型不能覆盖人工当前 TAR。
-- 工作中的表格通过物理页码引用 `_page_review/`，不在每个处理阶段再复制来源页。最终 `library/` 的节点来源页附件在组装时生成。
-- PDF、图像预览、HTML 和 XLSX 中可再生的部分按实际用途生成；不为每个小步骤写一套相同清单和空报告。
-- 重新解析保留必要原始证据和明确的人工修订，让旧修订失效或重新核验，不累积整棵临时快照。
+## 固定文件布局
 
-## 哈希与版本检查
+```text
+pdfs/<手册>.pdf
+figure_assets/<手册>/
+  _page_review/page_####.pdf
+  Figure_<编号>/Figure_<编号>.pdf
+  Figure_<编号>/Figure_<编号>.tar       # 当前可编辑版本
+runs/<手册>/
+  manual.json                          # schema 2；来源版本、Figure 页码、异常
+  intake/evidence/                      # 页面文字与必要的本地 OCR 证据
+  tasks/<操作>.json                     # 每个操作一份当前状态
+  figures/Figure_<编号>/
+    status.json
+    model/                             # 输入引用、渲染、计划、模型尝试、TAR 种子
+    checkpoint.sqlite                  # 中断时保留，完成后移除
+    review.json                        # 当前 TAR 的人工状态
+  tables/
+    manifest.json                      # schema 2；节点及来源页定位
+    segments.json
+    segments/                          # 实际送入 MinerU 的连续页 PDF
+    ocr/<段>/                          # OCR 内容和服务响应证据
+    index.json                         # 简短索引，内容真源为各 candidate.json
+    luna_batch_plan.json
+    luna_batches/
+      LUNA_TABLE_REVIEW_CONTRACT.md     # 本次合同快照
+      pages/page_####.png               # 每个来源页只渲染一次
+      batch_###/input_manifest.json
+      batch_###/output/                 # Luna 补丁与报告
+    Table_<编号>/                      # 无编号表使用稳定业务替代编号
+      candidate.json                   # schema 2 + revision
+      table.xlsx
+      table_provenance.json
+      notes.md
+      candidate_preview.png
+      review_request.json              # 仅需 Luna 的表提供精简输入
+      luna_patch.json                  # 有 Luna 结果时存在
+      human_review.json                # 人工旧值/新值、来源页、确认状态
+library/<手册>/                        # 可重建成品
+```
 
-现有上游以整份 PDF 的 SHA-256 作为手册 ID，并为单图再次生成内容 ID；下游有页面渲染指纹及表格人工核验的基准指纹。整合后可以直接传递手册名、Figure/Table 编号和来源物理页码，大部分用于重新辨认来源的指纹不再需要。
+组件暂时分开解析时使用同一 `tables/` 下的固定 `Table_*_part_###` 位置，合并后删去被吸收的组件目录。工作目录不按 `review_required`、`final` 等状态复制。来源 PDF 从共享 `_page_review/` 读取，不为每张候选再复制一套。最终成品自身携带来源页，以便独立使用。
 
-新内部流程使用稳定业务编号与显式版本号。手册重新导入、表格重解析和 Figure 自动重建都由对应流程更新版本，人工页面提交所见版本及原值。保存继续使用临时文件加原子替换。替换现有表格基准指纹前，必须先覆盖所有候选改写入口，保证版本递增，防止旧人工修改套到新表。
+## 保存与并发
 
-不增加逐文件哈希旁文件、阶段间重复哈希清单、哈希目录名或要求模型比较摘要的协议。源文件的外部修改可用大小和修改时间触发重新核验；确需内容指纹的个别边界应在同一记录中明确理由。
+- `manual.json` 是 intake 的唯一公开协议，两条支线只读；用文件大小和修改时间检测来源 PDF 被替换，不建立文件哈希清单。
+- 同手册有图像、表格、发布三把操作系统文件锁。图像与表格可并行；短暂发布结果与人工保存互斥；intake、组装与同手册两条支线互斥。进程退出自动释放锁。
+- Table 候选使用递增 `revision`，人工修订记录 `base_revision` 和保存版本。源候选变动、另一窗口保存或单元格旧值不符时拒绝覆盖。
+- Figure 保存通过 TAR 的大小与纳秒修改时间检查版本，核对 TAR 内来源图像未被替换后原子保存。模型重试只更新种子和诊断，不覆盖已有人工 TAR。
+- Luna 批次可分次应用；待合并的同编号组件尚未全部就绪时不开放该逻辑表。重复应用不重复修改内容，逐页公式检查摘要保留。
+- 组装先生成临时成品，再替换当前成品；失败时保留上一版。
 
-固定第三方源码提交用于版本可复现，与运行产物的文件哈希协议无关。
+## Hardcut
 
-## 环境与已完成验证
+仅支持 `materials-workbench` 命令行入口、上述目录、schema 2 手册/候选/人工记录以及 Luna 合同 2.0。原 `chart-annotator`、`table-workflow`、`build-pdf-tree` 命令及旧 manifest/状态目录不提供兼容。已迁入的既有资产是一次性转换结果，运行时不包含迁移层。
 
-- 新仓库：`C:/Users/plumlocal/Desktop/plot/materials-workbench`，已初始化 Git。
-- Python 3.12.10；`requires-python` 限定为 `>=3.12,<3.13`，`.python-version` 为 `3.12`。
-- 合并后 15 项直接运行依赖及开发依赖已通过 `uv sync` 安装，写入 `uv.lock`；主要模块导入与 `uv pip check` 通过。
-- 两份 `.env` 已合并。图像模型的三项配置有值，原 `MINERU_TOKEN` 为空。密钥值不进入文档、终端输出或 Git。
-- 新环境运行原项目测试：图像 151 项通过，表格 49 项通过；测试未调用真实模型或 MinerU 服务。
-- 用 WPD 5.3 核心源码检查 11 份项目，包含 3 份现有导出器生成的空 Dataset TAR（线性、对数、分类轴）和 8 份已有人工标注样本。坐标轴、Dataset 绑定、点组和重新序列化检查通过；3 份空项目新增数据点后再次载入也通过。
-- WPD 官方开发 HTML 已用新 uv 环境中的 Jinja2 生成，所需静态依赖已准备。其原 npm 安装引用 Git 版 `tarballjs`，本机 npm 禁止 Git 和远程包来源；调研准备改为安装 registry 中的依赖，并将官方锁定提交的 `tarball.js` 作为静态源码保存，未修改 npm 全局设置。正式构建沿用固定静态源码，避免要求用户解决这项安装差异。
-- WPD 与兼容样本临时放在被 Git 忽略的 `.research/`；正式整合只迁入必要源码、构建输入及许可证。WPD 前端采用 AGPL-3.0，保留官方许可证和来源记录。
-
-上游当前 `outputs/`、`runs/` 为空，因此这里的 TAR 检查使用现有测试样本和真实导出器生成的合成项目，不代表一次新的真实手册模型批处理已经完成。统一界面的文件保存、刷新恢复、快速切图及覆盖保护仍需实现后的浏览器验收。
-
-## 实现顺序与难点
-
-| 工作 | 难度 | 具体原因 |
-| --- | --- | --- |
-| 迁入两套代码，统一打包和配置 | 低 | 模块名不同，依赖和现有测试已兼容 |
-| 统一按手册与业务编号组织产物 | 中 | 要改写硬编码的相对层级、批次路径与恢复引用 |
-| 内嵌 WPD 并自动载入 TAR | 中 | 有载入入口，需要可靠的异步完成和切换处理 |
-| 保存、刷新恢复、人工完成状态 | 中，优先关注 | 必须保留图像坐标关系，避免旧页面或模型重跑覆盖人工成果 |
-| 迁入表格核验页面并衔接组装 | 低至中 | 已有实现可复用，主要适配新的固定表目录 |
-
-建议先迁入原代码与测试，再统一产物路径；随后实现 Figure 的自动打开、编辑、保存、重新打开这一条完整流程；最后接入表格页面和统一组装。验收至少覆盖同页多 Figure、空 Dataset、已有数据点、点组、缩放后采点、切换未保存项目、服务重启后恢复、重跑保护，以及一张跨页表的合成样本。
+算法代码来自图像项目 `95c2813` 与表格项目 `8b3d0cb`；保留核心算法和对应回归测试。WPD 5.3 固定为官方提交 `3a3ecb11606945d0701c8a488777e6861be70056`，来源和许可证见 `vendor/wpd/SOURCE.md`。WPD 自己的 TAR 数据版本仍为 `[4, 2]`，属于该第三方应用的原生格式。

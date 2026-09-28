@@ -1,0 +1,122 @@
+{
+  "schema_version": "human-reference/v1",
+  "figure_id": "3.3.1.3",
+  "source_tar_sha256": "915e493ee0103e2f80d5af23a2b94c64ec8011ccbe5b2079b53eaf1c9d86002f",
+  "axis_count": 3,
+  "dataset_count": 12,
+  "known_difficulty": "Three response axes; preserve paired upper/lower range boundaries, never filled areas.",
+  "scope": "Axis names/scales and dataset membership from actual human TAR. Domain kinds from documented examples. Region IDs are per-axis placeholders, not a gold panel count. Calibration remains in human.tar for later evaluation; not candidate evidence.",
+  "axes": [
+    {
+      "name": "Test Temperature (F) - Ftu (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 121.18276762402088,
+          "py": 1487.855091383812,
+          "dx": "-200",
+          "dy": "80",
+          "dz": null
+        },
+        {
+          "px": 881.9412532637075,
+          "py": 1487.855091383812,
+          "dx": "600",
+          "dy": "80",
+          "dz": null
+        },
+        {
+          "px": 121.18276762402088,
+          "py": 1113.0861618798956,
+          "dx": "-200",
+          "dy": "80",
+          "dz": null
+        },
+        {
+          "px": 121.18276762402088,
+          "py": 495.95169712793734,
+          "dx": "600",
+          "dy": "180",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Test Temperature (F) - Fty (ksi)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 121.55678851174935,
+          "py": 1489.8498694516973,
+          "dx": "-200",
+          "dy": "60",
+          "dz": null
+        },
+        {
+          "px": 882.0659268929504,
+          "py": 1488.291449086162,
+          "dx": "600",
+          "dy": "60",
+          "dz": null
+        },
+        {
+          "px": 1023.882180156658,
+          "py": 1365.1762402088773,
+          "dx": "-200",
+          "dy": "60",
+          "dz": null
+        },
+        {
+          "px": 1023.882180156658,
+          "py": 743.3665143603133,
+          "dx": "600",
+          "dy": "160",
+          "dz": null
+        }
+      ]
+    },
+    {
+      "name": "Test Temperature (F) - e (1 in) (Percent)",
+      "type": "XYAxes",
+      "isLogX": false,
+      "isLogY": false,
+      "noRotation": true,
+      "calibrationPoints": [
+        {
+          "px": 121.55678851174935,
+          "py": 1488.291449086162,
+          "dx": "-200",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 1023.882180156658,
+          "py": 1488.291449086162,
+          "dx": "600",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 121.55678851174935,
+          "py": 1488.291449086162,
+          "dx": "-200",
+          "dy": "0",
+          "dz": null
+        },
+        {
+          "px": 121.55678851174935,
+          "py": 1365.1762402088773,
+          "dx": "600",
+          "dy": "20",
+          "dz": null
+        }
+      ]
+    }
+  ]
+}

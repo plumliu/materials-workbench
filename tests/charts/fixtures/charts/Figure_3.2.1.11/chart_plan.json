@@ -1,0 +1,169 @@
+{
+  "schema_version": "chart-plan/v2",
+  "source_asset": {
+    "schema_version": "source-asset/v1",
+    "source_id": "sha256:3675af30fe206266dfd73f98191f3f9982db3d0455878d64abc8540daffc5fd1",
+    "path": "source.pdf",
+    "kind": "pdf",
+    "page_count": 1,
+    "manual_id": "sha256:0e23403e7cc8aea25d8d31e249253080da6d7d10dc3acdddb13e715e9effef7e",
+    "source_page": 10,
+    "figure_id": "3.2.1.11",
+    "render_width": null,
+    "render_height": null,
+    "pdf_to_pixel_transform": null
+  },
+  "axes": [
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_1",
+      "display_name": "Aging Temperature (F) - Ftu (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_2",
+      "display_name": "Aging Temperature (F) - Fty (ksi)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_3",
+      "display_name": "Aging Temperature (F) - RA (Percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    },
+    {
+      "schema_version": "axis-plan/v2",
+      "id": "axis_4",
+      "display_name": "Aging Temperature (F) - e(1 in) (Percent)",
+      "axis_type": "xy",
+      "x_scale": "linear",
+      "y_scale": "linear",
+      "x_label": "",
+      "y_label": "",
+      "x_unit": null,
+      "y_unit": null,
+      "categories": [],
+      "shared_x_axis_id": null,
+      "calibration": {}
+    }
+  ],
+  "datasets": [
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_1",
+      "axis_id": "axis_1",
+      "display_name": "Ftu Average Value + Spread of Value",
+      "kind": "point_group",
+      "group_names": [
+        "upper",
+        "average",
+        "lower"
+      ],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_2",
+      "axis_id": "axis_1",
+      "display_name": "Ftu | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_3",
+      "axis_id": "axis_2",
+      "display_name": "Fty Average Value + Spread of Value",
+      "kind": "point_group",
+      "group_names": [
+        "upper",
+        "average",
+        "lower"
+      ],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_4",
+      "axis_id": "axis_2",
+      "display_name": "Fty | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_5",
+      "axis_id": "axis_3",
+      "display_name": "RA Average Value + Spread of Value",
+      "kind": "point_group",
+      "group_names": [
+        "upper",
+        "average",
+        "lower"
+      ],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_6",
+      "axis_id": "axis_3",
+      "display_name": "RA | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_7",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in) Average Value + Spread of Value",
+      "kind": "point_group",
+      "group_names": [
+        "upper",
+        "average",
+        "lower"
+      ],
+      "data": []
+    },
+    {
+      "schema_version": "dataset-plan/v1",
+      "id": "dataset_8",
+      "axis_id": "axis_4",
+      "display_name": "e(1 in) | solid trend curve",
+      "kind": "curve",
+      "group_names": [],
+      "data": []
+    }
+  ],
+  "validation_issues": []
+}
