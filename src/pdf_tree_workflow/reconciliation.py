@@ -133,8 +133,8 @@ def reconcile_reparse(
         source_artifact = reparse_run_dir / candidate["artifact_directory"]
         destination = run_dir / source_artifact.name
         if destination.exists():
-            if not force:
-                raise FileExistsError(destination)
+            if (destination / "human_review.json").is_file():
+                raise ValueError("Existing human edits require explicit reconciliation")
             shutil.rmtree(destination)
         shutil.copytree(source_artifact, destination)
         revised["artifact_directory"] = destination.relative_to(run_dir).as_posix()

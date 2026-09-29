@@ -1,6 +1,5 @@
 """PDF intake: shared source pages, caption discovery and canonical Figure records."""
 
-import json
 import re
 import shutil
 import unicodedata
@@ -32,11 +31,10 @@ def normalize_text(text: str) -> str:
 
 
 def write_json(path: Path, value: object) -> None:
-    """Artifacts are immutable. Never silently replace an existing stage."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as stream:
-        json.dump(value, stream, ensure_ascii=False, indent=2)
-        stream.write("\n")
+    """Atomically replace generated stage artifacts when rerunning a stage."""
+    from materials_workbench.storage import write_json as atomic_json
+
+    atomic_json(path, value)
 
 
 def open_pdf(path: Path) -> pymupdf.Document:
@@ -89,7 +87,7 @@ def inventory_manual(source: Path, output: Path) -> tuple[Path, IntakeInventory]
                 )
             )
     directory = output.resolve() / source.stem
-    directory.mkdir(parents=True, exist_ok=False)
+    directory.mkdir(parents=True, exist_ok=True)
     return directory, IntakeInventory(
         manual_id=manual_id,
         source_pdf=str(source),
@@ -102,7 +100,7 @@ def inventory_manual(source: Path, output: Path) -> tuple[Path, IntakeInventory]
 
 def split_manual_pages(directory: Path, manifest: IntakeInventory) -> IntakeInventory:
     review = directory / "_page_review"
-    review.mkdir(exist_ok=False)
+    review.mkdir(exist_ok=True)
     with open_pdf(directory / manifest.source_pdf) as source:
         for record in manifest.pages:
             path = review / f"page_{record.source_page:04d}.pdf"
@@ -332,7 +330,7 @@ def materialize_figures(
         for caption in page.figures:
             figure_id = f"Figure_{caption.figure_id}"
             figure_dir = directory / figure_id
-            figure_dir.mkdir(parents=True, exist_ok=False)
+            figure_dir.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(directory / page.single_page_pdf, figure_dir / f"{figure_id}.pdf")
             jobs.append({"id": figure_id, "page": page.source_page, "caption": caption.caption})
     manifest.figure_job_count = len(jobs)

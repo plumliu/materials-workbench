@@ -15,3 +15,8 @@
 .technical pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:12px;border-radius:6px;font-size:12px}
 #copy-fallback{width:100%;height:180px;padding:12px}
 @media(max-width:650px){.intake,.assembly{align-items:flex-start;flex-wrap:wrap}.heading select{min-width:0;width:100%}}
+.recognition-cover{position:absolute;inset:0;z-index:20;display:grid;place-items:center;text-align:center;background:rgba(242,245,247,.96);padding:32px;color:#173b4a;backdrop-filter:blur(5px)}
+.recognition-cover[hidden]{display:none}.recognition-cover h2{font-size:24px}.recognition-spinner{width:72px;height:72px;border:7px solid #d5e5eb;border-top-color:#0c6074;border-radius:50%;animation:recognition-spin 1s linear infinite;margin:0 auto 24px}
+@keyframes recognition-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.recognition-spinner{animation:none}}
+dialog{max-width:560px;width:calc(100% - 40px);border:1px solid #c9d6dc;border-radius:12px;padding:28px;color:#203440;box-shadow:0 16px 60px #173b4a44}dialog::backdrop{background:#173b4a88}.dialog-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}dialog h2{font-size:22px}#editor-message{white-space:pre-wrap;max-height:150px;overflow:auto}

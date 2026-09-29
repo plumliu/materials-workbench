@@ -18,7 +18,6 @@ from chart_annotator.domain.workflow import (
 from chart_annotator.qwen import ModelReply
 from chart_annotator.semantic import (
     AXIS_EXAMPLE_FILES,
-    CORE_AXIS_EXAMPLE_FILES,
     DATASET_EXAMPLE_FILES,
     PROMPTS,
     dataset_example_output,
@@ -133,7 +132,7 @@ def test_protocols_reject_legacy_panel_ids():
 
 @pytest.mark.parametrize(
     "task,expected_count",
-    [("axes", 3), ("axes-repair", 6), ("datasets", 2), ("datasets-repair", 2)],
+    [("axes", 5), ("axes-repair", 5), ("datasets", 2), ("datasets-repair", 2)],
 )
 def test_requests_use_bounded_multimodal_examples(tmp_path, task, expected_count):
     example = load_example("3_2_1_7")
@@ -170,10 +169,11 @@ def test_requests_use_bounded_multimodal_examples(tmp_path, task, expected_count
     assert len(snapshot["example_files"]) == expected_count
     assert "examples" not in snapshot
     assert "image_sha256" not in snapshot
-    if task == "axes":
+    if task.startswith("axes"):
+        assert "fig_3_2_1_10.png" not in snapshot["example_files"]
         assert tuple(snapshot["example_files"]) == tuple(
             load_example(name.removesuffix(".json"))["image"]
-            for name in CORE_AXIS_EXAMPLE_FILES
+            for name in AXIS_EXAMPLE_FILES
         )
     if task.startswith("datasets"):
         assert set(snapshot["payload"]) >= {"axes", "schema"}
@@ -214,7 +214,10 @@ def test_dataset_reference_images_match_fixtures():
     for json_name, image_name in DATASET_EXAMPLE_FILES.items():
         figure = json_name.removesuffix(".json").replace("_", ".")
         source = (
-            repository / "tests/charts/fixtures/charts" / f"Figure_{figure}" / "source.png"
+            repository
+            / "tests/charts/fixtures/charts"
+            / f"Figure_{figure}"
+            / "source.png"
         )
         assert (PROMPTS / "examples" / image_name).read_bytes() == source.read_bytes()
 
@@ -372,3 +375,122 @@ def test_same_figure_is_excluded_without_image_hash(tmp_path, method):
         item["figure_id"] != "3.2.1.7"
         for item in select_examples(evidence, image, task="datasets")
     )
+
+
+def test_axis_repair_receives_scoped_passes_and_failures(tmp_path):
+    from chart_annotator.stages import plan_axes_node
+
+    example = load_example("3_2_1_10")
+    good = AxisStructure.model_validate(example["axis_output"])
+    bad = good.model_copy(deep=True)
+    bad.groups[0].ys[1].name = "ksi"
+    evidence = tmp_path / "evidence.json"
+    evidence.write_text(evidence_for(example).model_dump_json(), encoding="utf-8")
+    calls = []
+
+    class RepairModel:
+        def complete(self, messages):
+            prompt = messages[-1]["content"][0]["text"]
+            payload = json.loads(prompt[prompt.index('{"evidence":') :])
+            calls.append(payload)
+            if len(calls) == 1:
+                assert "validation_report" not in payload
+                return ModelReply(bad.model_dump_json(), "fake", 0, "stop")
+            report = payload["validation_report"]
+            assert report["scope"] == "structural_checks_only"
+            assert report["target"] == "structure"
+            assert payload["structure"] == bad.model_dump(mode="json")
+            failed = [c for c in report["checks"] if c["status"] == "failed"]
+            assert [(c["rule"], c["paths"]) for c in failed] == [
+                ("axis_name_quantity", ["groups[0].ys[1].name"])
+            ]
+            assert any(
+                c["paths"] == ["groups[0].x.name"] and c["status"] == "passed"
+                for c in report["checks"]
+            )
+            return ModelReply(good.model_dump_json(), "fake", 0, "stop")
+
+    result = plan_axes_node(RepairModel())(
+        {
+            "run_dir": str(tmp_path),
+            "axis_plan": "",
+            "evidence_graph": str(evidence),
+            "source_asset": SourceAsset(
+                source_id="test", path="chart.png", kind="image"
+            ),
+            "rendered_figure": str(PROMPTS / "examples" / example["image"]),
+        }
+    )
+    assert len(calls) == 2
+    assert result["status"] == "running"
+    assert all(
+        c["status"] == "passed" for c in result["structure_validation_report"]["checks"]
+    )
+    snapshot = json.loads(
+        (tmp_path / "attempts/e0_s0/model/axes-repair/request.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert snapshot["payload"]["validation_report"] == calls[1]["validation_report"]
+
+
+def test_axis_report_scopes_duplicate_names_to_both_directions():
+    axes = AxisStructure.model_validate(
+        {
+            "groups": [
+                {
+                    "x": {"name": "Time", "scale": "linear"},
+                    "ys": [{"name": "Stress", "scale": "linear"}] * 2,
+                }
+            ]
+        }
+    )
+    checks = []
+    asset = SourceAsset(source_id="test", path="chart.png", kind="image")
+    validate_axes(axes, evidence_for({}), asset, checks=checks)
+    duplicate = next(c for c in checks if c["rule"] == "distinct_y_names")
+    assert duplicate["status"] == "failed"
+    assert duplicate["paths"] == ["groups[0].ys[0].name", "groups[0].ys[1].name"]
+
+
+def test_dataset_report_scopes_cross_item_failures_and_keeps_loose_names():
+    axis = AxisPlan(id="a", display_name="Time - Stress", axis_type="xy")
+    proposal = DatasetStructure.model_validate(
+        {
+            "datasets": [
+                {
+                    "axis": "a",
+                    "name": "Stress Annealed filled circle",
+                    "kind": "scatter",
+                },
+                {
+                    "axis": "a",
+                    "name": "Stress Annealed filled circle",
+                    "kind": "scatter",
+                },
+                {
+                    "axis": "a",
+                    "name": "Stress | solid upper boundary",
+                    "kind": "range_boundary",
+                },
+                {"axis": "missing", "name": "Stress | open circle", "kind": "scatter"},
+            ]
+        }
+    )
+    checks = []
+    asset = SourceAsset(source_id="test", path="chart.png", kind="image")
+    issues = validate_datasets(proposal, [axis], asset, checks=checks)
+    failed = {c["rule"]: c["paths"] for c in checks if c["status"] == "failed"}
+    assert failed["duplicate_dataset_name"] == ["datasets[0].name", "datasets[1].name"]
+    assert failed["incomplete_range_band"] == ["datasets[2].name"]
+    assert failed["dataset_axis_unknown"] == ["datasets[3].axis"]
+    assert not any(i.code == "marker_name_incomplete" for i in issues)
+    assert any(
+        c["rule"] == "dataset_axis_unknown"
+        and c["paths"] == ["datasets[0].axis"]
+        and c["status"] == "passed"
+        for c in checks
+    )
+    # Shortened conditions and missing separators remain accepted.
+    loose = DatasetStructure(datasets=proposal.datasets[:1])
+    assert not validate_datasets(loose, [axis], asset)

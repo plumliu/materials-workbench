@@ -1,4 +1,4 @@
-"""Concrete FigureGraph stages. Large evidence stays in immutable files."""
+"""Concrete FigureGraph stages. Large evidence stays in regenerable files."""
 
 import json
 from pathlib import Path
@@ -261,6 +261,9 @@ def model_node(task: str, model: VisionLanguageModel | None):
             else None,
             review_context=context,
             previous_datasets=previous_datasets,
+            validation_report=state.get("structure_validation_report")
+            if current_task in ("axes-repair", "datasets-repair")
+            else None,
         )
         path = directory / (
             "expanded_grounding.json"
@@ -287,10 +290,12 @@ def validate_axes_plan(state):
     axes_plan = read(state["axis_plan"], AxisStructure)
     path = attempt_dir(state) / "axis_plan.json"
     write_json(path, axes_plan.model_dump(mode="json"))
+    checks = []
     issues = semantic.validate_axes(
         axes_plan,
         read(state["evidence_graph"], Evidence),
         state["source_asset"],
+        checks=checks,
     )
     if issues:
         write_json(
@@ -299,6 +304,11 @@ def validate_axes_plan(state):
         )
     result = {
         "axis_plan": str(path),
+        "structure_validation_report": {
+            "scope": "structural_checks_only",
+            "target": "structure",
+            "checks": checks,
+        },
         "status": "needs_resolution" if issues else "running",
         "validation_issues": issues,
     }
@@ -318,12 +328,19 @@ def validate_dataset_plan(state):
         },
         deep=True,
     )
+    checks = []
     issues = semantic.validate_datasets(
         datasets,
         approved.axes,
         state["source_asset"],
         node="validate_dataset_plan",
+        checks=checks,
     )
+    validation_report = {
+        "scope": "structural_checks_only",
+        "target": "previous",
+        "checks": checks,
+    }
     if issues:
         write_json(
             attempt_dir(state) / "dataset_validation.json",
@@ -349,6 +366,7 @@ def validate_dataset_plan(state):
         write_json(path, fallback.model_dump(mode="json"))
         return {
             "structure_plan": str(path),
+            "structure_validation_report": validation_report,
             "status": "running",
             "validation_issues": [],
             "skipped_datasets": str(skipped),
@@ -362,6 +380,7 @@ def validate_dataset_plan(state):
     write_json(path, structure.model_dump(mode="json"))
     return {
         "structure_plan": str(path),
+        "structure_validation_report": validation_report,
         "status": "needs_resolution" if issues else "running",
         "validation_issues": issues,
     }
@@ -841,9 +860,7 @@ def export_and_validate(state):
         Path(state["rendered_figure"]),
     )
     final = path.with_name("chart.tar")
-    if final.exists():
-        raise FileExistsError("Refusing to overwrite exported project")
-    path.rename(final)
+    path.replace(final)
     report = Path(state["run_dir"]) / "audit/roundtrip.json"
     write_json(report, result)
     return {

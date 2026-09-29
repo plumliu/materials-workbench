@@ -12,7 +12,7 @@ from chart_annotator.domain.models import (
     TextEvidence,
     ValidationIssue,
 )
-from chart_annotator.qwen import VisionLanguageModel
+from chart_annotator.qwen import ModelCallError, VisionLanguageModel
 
 Status = Literal[
     "running",
@@ -57,6 +57,7 @@ class GraphState(TypedDict, total=False):
     visual_review_status: Literal["pending", "consistent", "corrected", "blocked"]
     reviewed_calibration: str
     validation_issues: list[ValidationIssue]
+    structure_validation_report: dict
     repair_attempts: dict[str, int]
     evidence_preprocessing: Literal["original", "alternative"]
     output_artifacts: list[str]
@@ -107,14 +108,16 @@ def guarded(name: str, node: Node) -> Node:
     def run(state: GraphState) -> GraphState:
         try:
             result = node(state)
-        except Exception:  # noqa: BLE001 - sanitized graph error boundary
+        except Exception as error:  # noqa: BLE001 - sanitized graph error boundary
             result = {
                 "status": "failed",
                 "validation_issues": [
                     *state.get("validation_issues", []),
                     ValidationIssue(
                         code="node_failed",
-                        message=f"{name} failed; inspect local input and stage artifacts",
+                        message=f"{name}: {error}"
+                        if isinstance(error, ModelCallError)
+                        else f"{name} failed; inspect local input and stage artifacts",
                         node=name,
                     ),
                 ],
@@ -145,15 +148,14 @@ def run_general_ocr(state: GraphState) -> GraphState:
             directory, state["source_asset"], Path(state["rendered_figure"])
         )
     except Exception:  # noqa: BLE001 - sanitized local OCR error boundary
-        if not path.exists():
-            intake.write_json(
-                path,
-                TextEvidence(
-                    source_id=state["source_asset"].source_id,
-                    status="failed",
-                    reason="ocr_failed",
-                ).model_dump(mode="json"),
-            )
+        intake.write_json(
+            path,
+            TextEvidence(
+                source_id=state["source_asset"].source_id,
+                status="failed",
+                reason="ocr_failed",
+            ).model_dump(mode="json"),
+        )
         return {
             "ocr_text_observations": str(path),
             "status": "failed",

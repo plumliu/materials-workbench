@@ -66,10 +66,11 @@ def test_full_manual_baselines(manuals, label):
             )
     assert not list(directory.rglob("*.json"))
     page = directory / manifest.pages[0].single_page_pdf
-    original = page.read_bytes()
-    with pytest.raises(FileExistsError):
-        split_manual_pages(directory, manifest)
-    assert page.read_bytes() == original
+    with pymupdf.open(page) as pdf:
+        original = pdf[0].get_pixmap().samples
+    split_manual_pages(directory, manifest)
+    with pymupdf.open(page) as pdf:
+        assert pdf[0].get_pixmap().samples == original
 
 
 def test_scanned_caption_and_reference_negatives(manuals):
@@ -102,7 +103,7 @@ def make_pdf(path, blocks, *, rotation=0, password=None):
     return path
 
 
-def test_canonical_intake_multiple_figures_and_no_overwrite(tmp_path):
+def test_canonical_intake_multiple_figures_and_repeat(tmp_path):
     source = make_pdf(
         tmp_path / "Manual.pdf",
         [
@@ -121,8 +122,8 @@ def test_canonical_intake_multiple_figures_and_no_overwrite(tmp_path):
         assert actual[0].rotation == 90
         assert actual[0].get_pixmap().samples == expected[0].get_pixmap().samples
     assert not list((tmp_path / "assets").rglob("*.json"))
-    with pytest.raises(FileExistsError):
-        run_intake(source, tmp_path / "assets", tmp_path / "run")
+    repeated = run_intake(source, tmp_path / "assets", tmp_path / "run", ocr=lambda _: [])
+    assert repeated == data
 
 
 @pytest.mark.parametrize(

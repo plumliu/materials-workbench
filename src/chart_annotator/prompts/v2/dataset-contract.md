@@ -7,12 +7,34 @@ styles, evidence IDs, conditions or sampled data as separate fields.
 
 Return only:
 
-- `datasets`: one object per visible collection object, with exactly `axis`, `name`
-  and `kind`;
+- `datasets`: normally one object per visible collection object, with exactly
+  `axis`, `name` and `kind`; apply the equivalent-unit exception below;
 - `unresolved`: specific visual ambiguities, otherwise `[]`.
 
 Allowed `kind` values are `scatter`, `curve`, `bar`, `point_group`,
 `range_boundary` and `distribution_boundary`.
+
+## Equivalent-unit exception
+
+When multiple approved Axes represent the same visible marks and physical
+quantities in different printed units, create a corresponding Dataset for each
+collection object on EACH equivalent Axis. The same point or curve then carries
+the same physical information with different numerical coordinates. For example,
+a scatter series read as stress in MPa and in ksi gets one Dataset on each
+approved Axis. Do not split its markers between the two Axes; both Datasets refer
+to the same complete visible series.
+
+Keep the condition, marker or line style, and `kind` the same across these
+corresponding Datasets. Distinguish their names using the owning Axis's printed
+quantity and unit, for example `Stress (MPa) | filled circle` and
+`Stress (ksi) | filled circle`. Put the distinguishing quantity/unit in the
+property part so special forms such as `Average Value + Spread of Value` retain
+their required suffix. If only X units differ, include that printed X quantity
+and unit in the property part as well. Preserve all visible condition text.
+
+Apply this exception only to equivalent unit presentations of the same marks,
+not unrelated quantities or separate series. Use only supplied Axis IDs; do not
+invent additional unit systems, conditions, observations or sampled data.
 
 ## Non-negotiable final-name rules
 

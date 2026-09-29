@@ -95,18 +95,15 @@ def prepare_run(
         raise FileNotFoundError(pdf_path)
     if not figure_assets.is_dir():
         raise FileNotFoundError(figure_assets)
-    if run_dir.exists() and any(run_dir.iterdir()) and not force:
-        raise FileExistsError(f"Run directory is not empty: {run_dir}; use --force")
     run_dir.mkdir(parents=True, exist_ok=True)
-    if force and list(run_dir.glob("Table_*/human_review.json")):
+    if list(run_dir.glob("Table_*/human_review.json")):
         raise ValueError("Existing human edits require explicit reconciliation")
-    if force:
-        for name in ("segments", "ocr"):
-            path = run_dir / name
-            if path.exists():
-                import shutil
+    for name in ("segments", "ocr"):
+        path = run_dir / name
+        if path.exists():
+            import shutil
 
-                shutil.rmtree(path)
+            shutil.rmtree(path)
 
     manual: ParsedManual = parse_manual(pdf_path)
     page_review_dir = page_review_directory(figure_assets)

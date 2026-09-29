@@ -564,10 +564,6 @@ def build_tree(
     output_parent = output_parent.expanduser().resolve()
     output_parent.mkdir(parents=True, exist_ok=True)
     output_root = output_parent / pdf_path.stem
-    if output_root.exists() and not force:
-        raise FileExistsError(
-            f"Output already exists: {output_root}. Use --force to replace it."
-        )
 
     manual = parse_manual(pdf_path)
     table_run_dir = table_run_dir.expanduser().resolve()

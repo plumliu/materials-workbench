@@ -17,26 +17,18 @@
   ],
   "input": {
     "visible_text": [
-      "A = ∞ | Smooth | Heat A",
-      "A = ∞ | Smooth | Heat B",
-      "A = ∞ | Smooth",
-      "A = ∞ | Notch | Heat A",
-      "A = ∞ | Notch | Heat B",
-      "A = ∞ | Notch",
-      "A = 0.67 | Smooth | Heat A",
-      "A = 0.67 | Smooth | Heat B",
-      "A = 0.67 | Smooth",
-      "A = 0.67 | Notch | Heat A",
-      "A = 0.67 | Notch | Heat B",
-      "A = 0.67 | Notch",
-      "A = 0.25 | Smooth | Heat A",
-      "A = 0.25 | Smooth | Heat B",
-      "A = 0.25 | Smooth",
-      "A = 0.25 | Notch | Heat A",
-      "A = 0.25 | Notch | Heat B",
-      "A = 0.25 | Notch",
+      "Maximum Stress (ksi) (A = ∞)",
+      "Maximum Stress (ksi) (A = 0.67)",
+      "Maximum Stress (ksi) (A = 0.25)",
+      "A = ∞",
+      "A = 0.67",
+      "A = 0.25",
       "N_f",
-      "Maximum Stress"
+      "Smooth",
+      "Notch",
+      "Heat",
+      "A",
+      "B"
     ]
   },
   "axis_output": {

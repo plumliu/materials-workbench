@@ -1,6 +1,8 @@
 """Shared operations for the local UI and Codex CLI. No model agent scheduler."""
 
 import shutil
+import tempfile
+from contextlib import nullcontext
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import UTC, datetime
 from multiprocessing import get_context
@@ -37,8 +39,8 @@ def intake(root, name):
     from chart_annotator.intake import run_intake
 
     run, assets, pdf = paths(root, name)
-    if (run / "manual.json").exists() or assets.exists():
-        raise ValueError("手册已有接收记录或资产，请让 Codex 检查；不会覆盖已有成果")
+    if (run / "manual.json").exists():
+        manual(root, name)  # Reuse mappings only while the source PDF is unchanged.
     data = run_intake(pdf, root / "figure_assets", run)
     return {
         "status": "needs_resolution" if data["issues"] else "completed",
@@ -54,14 +56,22 @@ def figure_info(root, name, item):
     archive = assets / item["id"] / (item["id"] + ".tar")
     saved = read_json(work / "review.json") or {}
     signature = tar_version(archive) if archive.exists() else None
+    processing = read_json(work / "status.json") or {"status": "pending"}
+    if processing["status"] == "running":
+        try:
+            with lock(run, "figure-" + item["id"]):
+                processing = {**processing, "status": "interrupted"}
+        except ValueError:
+            pass
     return {
         **item,
+        "can_annotate": (assets / item["id"] / (item["id"] + ".pdf")).is_file(),
         "ready": archive.is_file(),
         "version": signature,
         "review_status": saved.get("status", "unreviewed")
         if saved.get("version") == signature
         else "unreviewed",
-        "processing": read_json(work / "status.json") or {"status": "pending"},
+        "processing": processing,
     }
 
 
@@ -71,7 +81,7 @@ def tar_version(path):
     return [stat.st_size, str(stat.st_mtime_ns)]
 
 
-def _figure(root, name, item, retry=False):
+def _figure(root, name, item, retry=False, *, replace_existing=False):
     from chart_annotator.runner import run_figure
 
     run, assets, _ = paths(root, name)
@@ -111,8 +121,8 @@ def _figure(root, name, item, retry=False):
         )
         if result["status"] == "exported":
             archive = assets / item["id"] / (item["id"] + ".tar")
-            with lock(run, "publication"):
-                if not archive.exists():
+            with nullcontext() if replace_existing else lock(run, "publication"):
+                if replace_existing or not archive.exists():
                     temporary = archive.with_suffix(".tmp")
                     shutil.copyfile(model_dir / "output/chart.tar", temporary)
                     temporary.replace(archive)
@@ -264,7 +274,7 @@ def summary(root, name):
     for action, state in tasks.items():
         if state.get("status") == "running":
             try:
-                with lock(run, *operation_locks(action)):
+                with lock(run, *operation_locks(action, run)):
                     state = {**state, "status": "interrupted"}
                     tasks[action] = state
             except ValueError:
@@ -305,17 +315,17 @@ def summary(root, name):
         )
     source_issue_count = len(issues)
     for item in image_items:
-        if not item["ready"]:
+        if not item["can_annotate"] or item["processing"]["status"] in {"failed", "interrupted", "needs_resolution"}:
             work = run / "figures" / item["id"]
             issues.append(
                 {
                     "page": item["page"],
-                    "code": "figure_tar_missing",
+                    "code": "figure_processing_failed" if item["can_annotate"] else "figure_source_missing",
                     "subject": item["id"],
-                    "message": "已有来源图像 PDF，但还没有可在 WPD 中打开的标注 TAR。",
+                    "message": item["processing"].get("message") or "来源文件缺失或智能识别未完成；有来源 PDF 时仍可直接手工标注。",
                     "next_step": "模型记录已标记导出成功，请 Codex 检查 model/output/chart.tar 和 Figure 资产目录，确认 TAR 是否已正确发布。"
                     if item["processing"]["status"] == "exported"
-                    else "请 Codex 检查本图的模型处理记录；未运行则启动识别，失败或中断则查明原因后重试。",
+                    else "可打开本图直接手工标注，或查看失败记录后重新点击智能识别。",
                     "processing_status": item["processing"]["status"],
                     "files": [
                         str(assets / item["id"] / (item["id"] + ".pdf")),
@@ -333,7 +343,7 @@ def summary(root, name):
         "figures": {
             "total": len(image_items) + len(missing_figures),
             "missing": len(missing_figures),
-            "ready": sum(i["ready"] for i in image_items),
+            "ready": sum(i["can_annotate"] for i in image_items),
             "verified": sum(i["review_status"] == "verified" for i in image_items),
             "failed": sum(
                 i["processing"]["status"] in {"failed", "needs_resolution"}
@@ -357,11 +367,20 @@ def summary(root, name):
     for key, label in (("figures", "图像"), ("tables", "表格")):
         counts = state[key]
         if counts["total"] > counts["verified"]:
-            pending.append(
-                f"{label}：共 {counts['total']} 项，已确认 {counts['verified']} 项，"
-                f"还有 {counts['total'] - counts['verified']} 项待确认"
-                f"（其中 {counts['total'] - counts['ready']} 项尚未就绪）。"
-            )
+            action = "可标注" if key == "figures" else "可核验"
+            available = counts["total"] - counts["missing"]
+            parts = [
+                f"{label}：{counts['ready']} 项{action}",
+                f"已确认 {counts['verified']} 项",
+                f"还有 {available - counts['verified']} 项待确认",
+            ]
+            if unavailable := available - counts["ready"]:
+                parts.append(f"其中 {unavailable} 项尚未就绪")
+            if counts["missing"]:
+                subject = "图" if key == "figures" else "表"
+                parts.append(f"另 {counts['missing']} 项目录{subject}缺少来源")
+            pending.append("，".join(parts) + "。")
+    source_issue_count -= len(missing_figures) + len(missing_tables)
     if source_issue_count:
         pending.append(
             f"另有 {source_issue_count} 项来源或目录匹配问题，详见下方问题详情。"
@@ -422,14 +441,40 @@ def assemble(root, name, allow_incomplete=False):
     }
 
 
-def operation_locks(action):
-    return (
+def operation_locks(action, run=None):
+    names = (
         ("figures", "tables", "publication")
         if action in {"intake", "assemble"}
         else ("figures",)
         if action == "figures"
         else ("tables",)
     )
+
+    if run is not None and action in {"intake", "assemble", "figures"}:
+        data = read_json(Path(run) / "manual.json") or {}
+        names += tuple("figure-" + item["id"] for item in data.get("figures", []))
+    return names
+
+
+def reset_figure_project(root, name, item):
+    """Called only after an explicit reset confirmation while holding the Figure lock."""
+    from chart_annotator.wpd import write_archive
+
+    run, assets, _ = paths(root, name)
+    directory = assets / item["id"]
+    archive = directory / (item["id"] + ".tar")
+    with tempfile.NamedTemporaryFile(dir=directory, suffix=".tar", delete=False) as stream:
+        temporary = Path(stream.name)
+    try:
+        write_archive(temporary, {
+            "version": [4, 2], "axesColl": [], "datasetColl": [], "measurementColl": [],
+        }, directory / (item["id"] + ".pdf"))
+        temporary.replace(archive)
+    finally:
+        temporary.unlink(missing_ok=True)
+    write_json(run / "figures" / item["id"] / "review.json", {
+        "status": "unreviewed", "version": tar_version(archive),
+    })
 
 
 def execute(root, name, action, **options):
@@ -444,7 +489,7 @@ def execute(root, name, action, **options):
     }
     if action not in actions:
         raise ValueError("未知操作")
-    with lock(run, *operation_locks(action)):
+    with lock(run, *operation_locks(action, run)):
         record = {"status": "running", "started": datetime.now(UTC).isoformat()}
         write_json(run / "tasks" / (action + ".json"), record)
         try:

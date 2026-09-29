@@ -6,6 +6,8 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+from contextlib import ExitStack
+from threading import Thread
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -18,6 +20,8 @@ from pdf_tree_workflow.review_server import ReviewHandler
 from .storage import ROOT, lock, write_json
 from .workflow import (
     AssemblyBlocked,
+    _figure as process_figure,
+    reset_figure_project,
     figure_info,
     manual,
     operation_locks,
@@ -96,6 +100,10 @@ class Handler(ReviewHandler):
                         for item in manual(self.root, name)["figures"]
                     ]
                 )
+            elif parsed.path == "/api/figure-pdf":
+                name, item = self._figure(query)
+                _, assets, _ = paths(self.root, name)
+                self._send(200, (assets / item["id"] / (item["id"] + ".pdf")).read_bytes(), "application/pdf")
             elif parsed.path == "/api/figure-tar":
                 name, item = self._figure(query)
                 _, assets, _ = paths(self.root, name)
@@ -154,8 +162,8 @@ class Handler(ReviewHandler):
                 if status not in {"draft", "verified"}:
                     raise ValueError("无效标注状态")
                 payload = self.rfile.read(length)
-                with self.save_lock, lock(run, "publication"):
-                    if tar_version(archive) != version:
+                with self.save_lock, lock(run, "figure-" + item["id"], "publication"):
+                    if (tar_version(archive) if archive.exists() else None) != version:
                         raise ValueError("该图已在其他窗口保存，请重新打开后再修改")
                     with tempfile.NamedTemporaryFile(
                         dir=archive.parent, suffix=".tar", delete=False
@@ -164,7 +172,9 @@ class Handler(ReviewHandler):
                         stream.write(payload)
                     try:
                         project, pixels = read_tar(temporary)
-                        original, original_pixels = read_tar(archive)
+                        original_pixels = read_tar(archive)[1] if archive.exists() else (
+                            assets / item["id"] / (item["id"] + ".pdf")
+                        ).read_bytes()
                         if pixels != original_pixels:
                             raise ValueError(
                                 "原始图像已被替换，请保留当前 TAR 的原图继续标注"
@@ -193,6 +203,43 @@ class Handler(ReviewHandler):
                     finally:
                         temporary.unlink(missing_ok=True)
                     self._json(figure_info(self.root, name, item))
+            elif parsed.path == "/api/figure-recognize":
+                if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
+                    raise ValueError("Expected JSON")
+                incoming = json.loads(self.rfile.read(length))
+                if incoming.get("confirm_reset") is not True:
+                    raise ValueError("请先确认清空当前图的全部标注")
+                name, item = self._figure(query)
+                run, assets, _ = paths(self.root, name)
+                archive = assets / item["id"] / (item["id"] + ".tar")
+                # The short manual gate closes the race with intake / whole-book jobs.
+                # The Figure lock is handed to the worker and lasts for the entire run.
+                with self.save_lock, lock(run, "figures"), ExitStack() as held:
+                    held.enter_context(lock(run, "figure-" + item["id"]))
+                    if (tar_version(archive) if archive.exists() else None) != incoming.get("version"):
+                        raise ValueError("该图已更新，请重新打开后再发起识别")
+                    reset_figure_project(self.root, name, item)
+                    write_json(run / "figures" / item["id"] / "status.json", {"status": "running", "id": item["id"]})
+                    info = figure_info(self.root, name, item)
+                    ownership = held.pop_all()
+                    root = self.root
+
+                    def recognize():
+                        with ownership:
+                            try:
+                                process_figure(root, name, item, retry=True, replace_existing=True)
+                            except Exception as exc:
+                                write_json(run / "figures" / item["id"] / "status.json", {
+                                    "status": "failed", "error": type(exc).__name__,
+                                    "message": "智能识别未完成，可以重新识别或继续手工标注。",
+                                })
+
+                    try:
+                        Thread(target=recognize, daemon=True, name="recognize-" + item["id"]).start()
+                    except Exception:
+                        ownership.close()
+                        raise
+                self._json(info, 202)
             elif parsed.path == "/api/action":
                 if (
                     self.headers.get("Content-Type", "").split(";")[0]
@@ -211,7 +258,7 @@ class Handler(ReviewHandler):
                     current = self.children.get(key)
                     if current and current.poll() is None:
                         raise ValueError("操作已启动")
-                    with lock(run, *operation_locks(action)):
+                    with lock(run, *operation_locks(action, run)):
                         if action == "assemble":
                             require_assembly(
                                 summary(self.root, name),

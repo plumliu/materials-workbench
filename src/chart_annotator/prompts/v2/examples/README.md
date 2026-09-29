@@ -4,19 +4,25 @@ The directory contains eight reviewed JSON examples. They are evidence for model
 prompts, not unquestionable ground truth, and contain no sampled chart data or
 credentials.
 
-Axis planning has a six-example curriculum:
+Axis planning has a five-example curriculum:
 
 | Example | Axis lesson |
 |---|---|
-| 3.2.1.10 | Ordinary shared numeric X with several Y mappings |
 | 3.2.1.1 | Broken numeric X and side-specific Y mappings |
 | 3.2.1.7 | Categorical X and a shared 110/30 boundary |
 | 3.2.1.6 | Four spatially separate coordinate frames |
 | 3.5.1.1 | Logarithmic X with vertically separate Y mappings |
 | 3.2.7.2.3 | Two complete unit systems in one physical frame |
 
-A normal Axis request receives only 3.2.1.10, 3.2.1.7 and 3.2.7.2.3. The full
-six-image curriculum is used once only after Axis structure validation fails.
+Both the first Axis request and its focused repair receive all five images.
+Structural validation cannot detect every plausible but incorrect mapping.
+Figure 3.2.1.10 is retained for offline regression tests and is not sent in Axis requests.
+
+Axis and Dataset repairs receive the previous proposal and a per-rule validation
+report with passed/failed status and zero-based field paths. Passed checks confirm
+only the named structural rules, not image semantics. Repair instructions preserve
+unaffected fields unless a dependent correction or current image evidence requires
+a change. Reports are included in the repair request.json payload.
 
 Figures 2.3.2.1 and 3.2.1.1 are coordinate-bearing Grounding examples. They teach
 rough 0–1000 positions at axis intersections; Python performs local snapping,

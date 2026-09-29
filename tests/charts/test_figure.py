@@ -38,8 +38,9 @@ def test_crop_rotation_transform_matches_rendered_pixels(tmp_path, rotation):
     assert json.loads((directory / "render/transform.json").read_text())[
         "pixel_to_pdf"
     ] == list(~matrix)
-    with pytest.raises(FileExistsError):
-        render_figure(directory, asset)
+    repeated, repeated_path = render_figure(directory, asset)
+    assert repeated == rendered
+    assert repeated_path == image_path
 
 
 def test_image_preserves_pixels(tmp_path):

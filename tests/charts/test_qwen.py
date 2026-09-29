@@ -17,7 +17,7 @@ def test_fake_transport_configuration_and_redacted_error(monkeypatch):
             opened.update(kwargs)
             assert kwargs["api_key"] == "synthetic-test-key"
             assert kwargs["timeout"] == 900
-            assert kwargs["max_retries"] == 0
+            assert kwargs["max_retries"] == 3
             self.chat = SimpleNamespace(completions=self)
 
         def __enter__(self):
@@ -69,8 +69,70 @@ def test_fake_transport_configuration_and_redacted_error(monkeypatch):
     monkeypatch.setattr(FakeClient, "create", fail)
     with pytest.raises(RuntimeError) as error:
         adapter.complete([])
-    assert str(error.value) == "Qwen transport failed: OpenAIError, HTTP unavailable"
+    assert "OpenAIError, HTTP unavailable: [REDACTED]: server diagnostics" in str(
+        error.value
+    )
     assert "synthetic-test-key" not in str(error.value)
+
+
+@pytest.mark.parametrize("status", [503, 504])
+def test_provider_failure_body_survives_artifacts_and_graph(
+    tmp_path, monkeypatch, status
+):
+    import json
+
+    import httpx
+    from openai import InternalServerError
+
+    from chart_annotator.domain.workflow import Evidence, Geometry
+    from chart_annotator.graph import guarded
+    from chart_annotator.semantic import request
+
+    secret = "synthetic-provider-key"
+    body = "<html>Upstream unavailable; diagnostic: " + secret + "</html>"
+
+    class FailedClient:
+        def __init__(self, **kwargs):
+            self.chat = SimpleNamespace(completions=self)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def create(self, **kwargs):
+            response = httpx.Response(
+                status,
+                text=body,
+                headers={"x-request-id": "request-test-123"},
+                request=httpx.Request(
+                    "POST", "https://example.test/v1/chat/completions"
+                ),
+            )
+            raise InternalServerError("Upstream failed", response=response, body=body)
+
+    monkeypatch.setattr(qwen, "OpenAI", FailedClient)
+    adapter = qwen.QwenModel(ModelConfig(api_key=SecretStr(secret)))
+    image = tmp_path / "input.png"
+    Image.new("RGB", (100, 100)).save(image)
+    evidence = Evidence(
+        source_id="test",
+        geometry=Geometry(
+            image_size=(100, 100), preprocessing="test", spines=[], ticks=[]
+        ),
+        texts=[],
+    )
+    result = guarded(
+        "plan_axes",
+        lambda state: request(adapter, "axes", evidence, image, tmp_path / "model"),
+    )({})
+    failure = json.loads((tmp_path / "model/failure.json").read_text())
+    assert failure["status_code"] == status
+    assert failure["request_id"] == "request-test-123"
+    assert failure["response_body"] == body.replace(secret, "[REDACTED]")
+    assert failure["response_body"] in result["validation_issues"][0].message
+    assert secret not in str(failure) + str(result)
 
 
 @pytest.mark.parametrize(
@@ -127,3 +189,57 @@ def test_incomplete_response_cannot_pass(monkeypatch, finish_reason, text):
     monkeypatch.setattr(qwen, "OpenAI", FakeClient)
     with pytest.raises(RuntimeError):
         qwen.QwenModel(ModelConfig(api_key=SecretStr("synthetic-key"))).complete([])
+
+
+@pytest.mark.parametrize("statuses", [[503, 504, 429, 200], [503] * 4, [401]])
+def test_sdk_retries_transient_failures_with_exponential_backoff(monkeypatch, statuses):
+    import httpx2
+    from openai import OpenAI, _base_client
+
+    calls, delays = [], []
+
+    def respond(request):
+        status = statuses[len(calls)]
+        calls.append(status)
+        if status != 200:
+            return httpx2.Response(
+                status, json={"error": {"message": "upstream detail"}}
+            )
+        return httpx2.Response(
+            200,
+            json={
+                "id": "test",
+                "object": "chat.completion",
+                "created": 0,
+                "model": "fake",
+                "choices": [
+                    {
+                        "index": 0,
+                        "finish_reason": "stop",
+                        "message": {"role": "assistant", "content": "ok"},
+                    }
+                ],
+            },
+        )
+
+    def client(**kwargs):
+        return OpenAI(
+            **kwargs, http_client=httpx2.Client(transport=httpx2.MockTransport(respond))
+        )
+
+    monkeypatch.setattr(qwen, "OpenAI", client)
+    monkeypatch.setattr(_base_client.time, "sleep", delays.append)
+    monkeypatch.setattr(_base_client, "random", lambda: 0)
+    model = qwen.QwenModel(
+        ModelConfig(
+            api_key=SecretStr("synthetic-key"), base_url="https://example.test/v1"
+        )
+    )
+    if statuses[-1] == 200:
+        assert model.complete([]).text == "ok"
+    else:
+        with pytest.raises(qwen.ModelCallError, match="upstream detail") as error:
+            model.complete([])
+        assert error.value.metadata["status_code"] == statuses[-1]
+    assert calls == statuses
+    assert delays == ([0.5, 1.0, 2.0] if len(statuses) == 4 else [])

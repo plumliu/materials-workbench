@@ -4,9 +4,30 @@
   const snapshot = () => JSON.stringify(wpd.appData.getPlotData().serialize(wpd.appData.getFileManager().getMetadata()));
   wpd.handleLaunchArgs = () => { ready = true; };
   window.onbeforeunload = null; // The outer editor owns the actual unsaved-change check.
+  function resetEditor() {
+    for (const popup of document.querySelectorAll('.popup')) {
+      if (popup.style.visibility === 'visible') wpd.popup.close(popup.id);
+    }
+    wpd.sidebar.clear();
+    wpd.toolbar.clear();
+    wpd.graphicsWidget.removeTool();
+    wpd.graphicsWidget.removeRepainter();
+    wpd.appData.reset();
+    wpd.appData.setPageManager(null);
+  }
   window.workbench = {
     get ready() { return ready; },
     snapshot,
+    async loadPDF(blob, name) {
+      const file = new File([blob], name, {type: 'application/pdf'});
+      resetEditor();
+      wpd.imageManager.initializeFileManager([file], true);
+      await wpd.imageManager.loadFromFile(file, true);
+      wpd.tree.refresh();
+      wpd.tree.selectPath('/' + wpd.gettext('axes'));
+      wpd.graphicsWidget.zoomFit();
+      return snapshot();
+    },
     async load(blob) {
       const reader = new tarball.TarReader();
       const files = await reader.readFile(blob);
@@ -19,8 +40,7 @@
         const type = name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/png';
         return new File([reader.getFileBlob(root + name, type)], name, {type});
       });
-      wpd.appData.reset();
-      wpd.appData.setPageManager(null);
+      resetEditor();
       wpd.imageManager.initializeFileManager(images, true);
       await wpd.imageManager.loadFromFile(images[0], true);
       const metadata = wpd.appData.getPlotData().deserialize(project);
@@ -29,7 +49,7 @@
       wpd.graphicsWidget.removeTool();
       wpd.graphicsWidget.removeRepainter();
       wpd.tree.refresh();
-      if (wpd.appData.getPlotData().getDatasetCount()) wpd.tree.selectPath('/' + wpd.gettext('datasets'));
+      wpd.tree.selectPath('/' + wpd.gettext(wpd.appData.getPlotData().getDatasetCount() ? 'datasets' : 'axes'));
       wpd.graphicsWidget.zoomFit();
       return snapshot();
     },

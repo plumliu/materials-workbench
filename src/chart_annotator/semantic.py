@@ -31,23 +31,15 @@ from chart_annotator.qwen import ModelCallError, VisionLanguageModel, image_mess
 
 PROMPTS = Path(__file__).parent / "prompts/v2"
 
-# This is the complete production Axis curriculum.  Each image teaches a
-# distinct coordinate-system problem; Dataset-only examples are deliberately
-# excluded from the default pipeline.
+# Use the complete Axis curriculum on the first pass: structural validation
+# cannot detect a plausible but semantically wrong scale or mapping.
 AXIS_EXAMPLE_FILES = (
-    "3_2_1_10.json",  # ordinary shared X with several Y mappings
     "3_2_1_1.json",  # broken numeric X and side-specific Y mappings
     "3_2_1_7.json",  # categorical X and a shared 110/30 boundary
     "3_2_1_6.json",  # four spatially independent coordinate frames
     "3_5_1_1.json",  # logarithmic X with vertically separate Y mappings
     "3_2_7_2_3.json",  # two complete unit systems in one physical frame
 )
-CORE_AXIS_EXAMPLE_FILES = (
-    "3_2_1_10.json",
-    "3_2_1_7.json",
-    "3_2_7_2_3.json",
-)
-
 DATASET_EXAMPLE_FILES = {
     "3_2_1_7.json": "dataset_3_2_1_7.png",  # categorical scatter and marker names
     "3_2_1_11.json": "dataset_3_2_1_11.png",  # vertical point groups and curves
@@ -306,11 +298,10 @@ def select_examples(
         examples.append((score, path.name, example))
     if task in ("axes", "axes-repair"):
         by_filename = {filename: example for _, filename, example in examples}
-        curriculum = (
-            AXIS_EXAMPLE_FILES if task == "axes-repair" else CORE_AXIS_EXAMPLE_FILES
-        )
         return [
-            by_filename[filename] for filename in curriculum if filename in by_filename
+            by_filename[filename]
+            for filename in AXIS_EXAMPLE_FILES
+            if filename in by_filename
         ]
 
     examples.sort(key=lambda item: (-item[0], item[1]))
@@ -331,6 +322,7 @@ def request(
     grounding: Grounding | None = None,
     review_context: dict | None = None,
     previous_datasets: DatasetStructure | None = None,
+    validation_report: dict | None = None,
 ):
     structural = task in ("axes", "axes-repair", "datasets", "datasets-repair")
     grounding_task = task in ("binding", "repair", "failed-axis-review")
@@ -368,6 +360,8 @@ def request(
         payload["review_context"] = review_context
     if issues:
         payload["issues"] = [i.model_dump(mode="json") for i in issues]
+    if validation_report is not None:
+        payload["validation_report"] = validation_report
     instructions = (PROMPTS / f"{task}-task.md").read_text(encoding="utf-8")
     if task in ("datasets", "datasets-repair"):
         instructions = (
@@ -443,6 +437,8 @@ def request(
             "image_size": evidence.geometry.image_size,
         },
     )
+    for name in ("failure.json", "response.json", "validated_response.json", "expanded_grounding.json"):
+        (directory / name).unlink(missing_ok=True)
     started = time.perf_counter()
     try:
         reply = model.complete(messages)
@@ -454,6 +450,8 @@ def request(
         write_json(
             directory / "failure.json", {"status": "failed", "error": safe, **metadata}
         )
+        if isinstance(error, ModelCallError):
+            raise
         raise RuntimeError("Model request failed; see sanitized failure.json") from None
     write_json(
         directory / "response.json",
@@ -480,53 +478,118 @@ def request(
     return result
 
 
+def _record_check(checks, rule, paths, passed, requirement):
+    if checks is not None:
+        checks.append(
+            {
+                "rule": rule,
+                "paths": paths,
+                "status": "passed" if passed else "failed",
+                "requirement": requirement,
+            }
+        )
+    return passed
+
+
 def validate_axes(
     structure: AxisStructure,
     evidence: Evidence,
     asset: SourceAsset,
     *,
     node: str = "validate_axes_plan",
+    checks: list[dict] | None = None,
 ) -> list[ValidationIssue]:
-    problems = []
-    if not structure.groups or structure.unresolved:
-        problems.append("Axis structure empty or explicitly unresolved")
-    if any(
-        len({y.name.strip() for y in group.ys}) != len(group.ys)
-        for group in structure.groups
-    ):
-        problems.append("Y mappings in one group must have distinct image-truth names")
-    try:
-        expanded = structure.expand()
-        ChartPlan(source_asset=asset, axes=expanded, datasets=[])
-    except (ValidationError, ValueError):
-        expanded = []
-        problems.append("Expanded Axis names or mappings violate ChartPlan rules")
+    issues = []
+
+    def check(rule, paths, passed, message):
+        if not _record_check(checks, rule, paths, passed, message):
+            issues.append(
+                ValidationIssue(
+                    code="axis_structure_invalid",
+                    message=f"{', '.join(paths)}: {message}",
+                    node=node,
+                    repair="semantic",
+                )
+            )
+
+    check(
+        "axis_inventory",
+        ["groups"],
+        bool(structure.groups),
+        "At least one Axis group is required",
+    )
+    check(
+        "axis_unresolved",
+        ["unresolved"],
+        not structure.unresolved,
+        "The proposal's unresolved list must be empty",
+    )
     placeholder = re.compile(
         r"\b(?:axis|dataset|curve)[_ ]\d+\b|<[^>]+>|\.\.\.|…|图片文字不清",
         re.IGNORECASE,
     )
     unit_only = {"%", "percent", "pa", "kpa", "mpa", "gpa", "ksi"}
-    direction_names = [
-        direction.name
-        for group in structure.groups
-        for direction in (group.x, *group.ys)
-    ]
-    if any(placeholder.search(name) for name in direction_names):
-        problems.append("Axis names must use visible image text, not placeholders")
-    if any(
-        "".join(unicodedata.normalize("NFKC", name).split()).casefold() in unit_only
-        for name in direction_names
-    ):
-        problems.append("A unit alone is not a numerical quantity")
-    return [
-        ValidationIssue(
-            code="axis_structure_invalid",
-            message=p,
-            node=node,
-            repair="semantic",
+    pair_names = {}
+    for gi, group in enumerate(structure.groups):
+        root = f"groups[{gi}]"
+        names = {}
+        for yi, y in enumerate(group.ys):
+            names.setdefault(y.name.strip(), []).append(f"{root}.ys[{yi}].name")
+            pair_names.setdefault(f"{group.x.name} - {y.name}", []).append(
+                f"{root}.ys[{yi}]"
+            )
+            check(
+                "numeric_direction_required",
+                [f"{root}.x.scale", f"{root}.ys[{yi}].scale"],
+                not (group.x.scale == y.scale == "categorical"),
+                "An X-Y pair cannot have two categorical directions",
+            )
+        for paths in names.values():
+            check(
+                "distinct_y_names",
+                paths,
+                len(paths) == 1,
+                "Y mappings in one group must have distinct names",
+            )
+        directions = [
+            (f"{root}.x", group.x),
+            *((f"{root}.ys[{yi}]", y) for yi, y in enumerate(group.ys)),
+        ]
+        for path, direction in directions:
+            check(
+                "axis_name_placeholder",
+                [f"{path}.name"],
+                not placeholder.search(direction.name),
+                "Axis names must not contain placeholder patterns",
+            )
+            normalized = "".join(
+                unicodedata.normalize("NFKC", direction.name).split()
+            ).casefold()
+            check(
+                "axis_name_quantity",
+                [f"{path}.name"],
+                normalized not in unit_only,
+                "A unit alone is not a numerical quantity",
+            )
+    for paths in pair_names.values():
+        check(
+            "distinct_axis_names",
+            paths,
+            len(paths) == 1,
+            "Expanded X-Y Axis names must be unique across the Figure",
         )
-        for p in problems
-    ]
+    valid = True
+    try:
+        ChartPlan(source_asset=asset, axes=structure.expand(), datasets=[])
+    except (ValidationError, ValueError):
+        valid = False
+    check(
+        "axis_chart_plan",
+        ["$"],
+        valid,
+        "Expanded Axis names or mappings must satisfy ChartPlan structural rules",
+    )
+    return issues
 
 
 def validate_datasets(
@@ -535,47 +598,48 @@ def validate_datasets(
     asset: SourceAsset,
     *,
     node: str = "validate_dataset_plan",
+    checks: list[dict] | None = None,
 ) -> list[ValidationIssue]:
-    """Validate the minimal Dataset response without requiring redundant metadata."""
+    """Report existing structural rules without tightening naming requirements."""
     issues = []
 
-    def issue(code: str, message: str, *ids: str) -> None:
-        issues.append(
-            ValidationIssue(
-                code=code,
-                message=message,
-                node=node,
-                evidence_ids=list(ids),
-                repair="semantic",
+    def check(code, paths, passed, message, *ids):
+        if not _record_check(checks, code, paths, passed, message):
+            issues.append(
+                ValidationIssue(
+                    code=code,
+                    message=f"{', '.join(paths)}: {message}",
+                    node=node,
+                    evidence_ids=list(ids),
+                    repair="semantic",
+                )
             )
-        )
 
-    if not proposal.datasets:
-        issue("dataset_inventory_empty", "At least one visible Dataset is required")
-    if proposal.unresolved:
-        issue(
-            "dataset_unresolved",
-            "Dataset inventory contains an unresolved visual ambiguity",
-        )
+    check(
+        "dataset_inventory_empty",
+        ["datasets"],
+        bool(proposal.datasets),
+        "At least one visible Dataset is required",
+    )
+    check(
+        "dataset_unresolved",
+        ["unresolved"],
+        not proposal.unresolved,
+        "The proposal's unresolved list must be empty",
+    )
     axis_ids = {axis.id for axis in axes}
     used_axes = {dataset.axis for dataset in proposal.datasets}
-    unknown = used_axes - axis_ids
-    if unknown:
-        issue(
-            "dataset_axis_unknown",
-            "Dataset must reference one of the approved Axis IDs",
-            *sorted(unknown),
-        )
-    missing = axis_ids - used_axes
-    if missing:
-        issue(
+    for axis in axes:
+        check(
             "axis_without_dataset",
-            "Every approved Axis needs at least one visible Dataset",
-            *sorted(missing),
+            ["datasets"],
+            axis.id in used_axes,
+            f"Approved Axis {axis.id} needs at least one visible Dataset",
+            axis.id,
         )
 
-    names = set()
-    bands: dict[tuple[str, str], set[str]] = {}
+    names = {}
+    bands = {}
     marker = re.compile(
         r"(?:\b(?:open|filled|half-filled)\s+(?:inverted\s+)?"
         r"(?:circle|square|triangle|diamond)\b|\b(?:cross|plus|star)\b)",
@@ -584,93 +648,114 @@ def validate_datasets(
     line = re.compile(r"\b(?:solid|dashed|dotted|dash-dot)\b", re.IGNORECASE)
     for index, dataset in enumerate(proposal.datasets):
         dataset_id = f"dataset_{index:03d}"
+        root = f"datasets[{index}]"
+        name_paths = [f"{root}.name"]
+        check(
+            "dataset_axis_unknown",
+            [f"{root}.axis"],
+            dataset.axis in axis_ids,
+            "Dataset must reference one of the approved Axis IDs",
+            dataset_id,
+        )
         name = dataset.name.strip()
         normalized = "".join(name.split()).casefold()
-        if not name or re.search(
-            r"\b(?:axis|dataset|curve)[_ ]\d+\b|<[^>]+>|\.\.\.|…",
-            name,
-            re.IGNORECASE,
-        ):
-            issue(
-                "dataset_name_invalid",
-                "Use one complete image-truth name without placeholders",
-                dataset_id,
-            )
-        if normalized in names:
-            issue(
-                "duplicate_dataset_name",
-                "Dataset names must be unique across the whole Figure project",
-                dataset_id,
-            )
-        names.add(normalized)
-        if re.search(r"\brun[ -]?out\b", name, re.IGNORECASE):
-            issue(
-                "arrow_dataset",
-                "Arrowed markers remain in their marker Dataset; runout is not a Dataset",
-                dataset_id,
-            )
-        if dataset.kind == "scatter" and not marker.search(name):
-            issue(
+        check(
+            "dataset_name_invalid",
+            name_paths,
+            bool(name)
+            and not re.search(
+                r"\b(?:axis|dataset|curve)[_ ]\d+\b|<[^>]+>|\.\.\.|…",
+                name,
+                re.IGNORECASE,
+            ),
+            "Dataset name must be nonempty and contain no placeholder patterns",
+            dataset_id,
+        )
+        names.setdefault(normalized, []).append((f"{root}.name", dataset_id))
+        check(
+            "arrow_dataset",
+            name_paths,
+            not re.search(r"\brun[ -]?out\b", name, re.IGNORECASE),
+            "Arrowed markers remain in their marker Dataset; runout is not a Dataset",
+            dataset_id,
+        )
+        if dataset.kind == "scatter":
+            check(
                 "marker_name_incomplete",
-                "Scatter name must contain the visible fill and marker shape",
+                name_paths,
+                bool(marker.search(name)),
+                "Scatter name must contain a recognized fill/shape descriptor",
                 dataset_id,
             )
-        elif dataset.kind == "curve" and (
-            not line.search(name) or "curve" not in name.casefold()
-        ):
-            issue(
+        elif dataset.kind == "curve":
+            check(
                 "curve_name_incomplete",
-                "Curve name must contain its visible line style and curve role",
+                name_paths,
+                bool(line.search(name)) and "curve" in name.casefold(),
+                "Curve name must contain a recognized line style and the word curve",
                 dataset_id,
             )
-        elif dataset.kind == "point_group" and not name.endswith(
-            "Average Value + Spread of Value"
-        ):
-            issue(
+        elif dataset.kind == "point_group":
+            check(
                 "point_group_name_invalid",
+                name_paths,
+                name.endswith("Average Value + Spread of Value"),
                 "Vertical spread uses '<property> Average Value + Spread of Value'",
                 dataset_id,
             )
-        elif dataset.kind == "distribution_boundary" and (
-            not line.search(name)
-            or "frequency distribution boundary" not in name.casefold()
-        ):
-            issue(
+        elif dataset.kind == "distribution_boundary":
+            check(
                 "distribution_name_incomplete",
+                name_paths,
+                bool(line.search(name))
+                and "frequency distribution boundary" in name.casefold(),
                 "Distribution name must contain line style and 'frequency distribution boundary'",
                 dataset_id,
             )
         elif dataset.kind == "range_boundary":
             match = re.search(r"\b(upper|lower) boundary\b", name, re.IGNORECASE)
-            if not line.search(name) or not match:
-                issue(
-                    "range_name_incomplete",
-                    "Range boundary name must contain line style and upper/lower boundary",
-                    dataset_id,
-                )
-            else:
+            valid = bool(line.search(name) and match)
+            check(
+                "range_name_incomplete",
+                name_paths,
+                valid,
+                "Range boundary name must contain line style and upper/lower boundary",
+                dataset_id,
+            )
+            if valid:
                 identity = "".join(
                     re.sub(
-                        r"\b(?:upper|lower) boundary\b",
-                        "boundary",
-                        name.casefold(),
+                        r"\b(?:upper|lower) boundary\b", "boundary", name.casefold()
                     ).split()
                 )
-                bands.setdefault((dataset.axis, identity), set()).add(
-                    match.group(1).casefold()
+                bands.setdefault((dataset.axis, identity), []).append(
+                    (match.group(1).casefold(), f"{root}.name")
                 )
-    for (axis_id, _), roles in bands.items():
-        if roles != {"upper", "lower"}:
-            issue(
-                "incomplete_range_band",
-                "A range band needs one upper and one lower boundary",
-                axis_id,
-            )
+    for entries in names.values():
+        check(
+            "duplicate_dataset_name",
+            [path for path, _ in entries],
+            len(entries) == 1,
+            "Dataset names must be unique across the whole Figure project",
+            *(identifier for _, identifier in entries),
+        )
+    for (axis_id, _), entries in bands.items():
+        check(
+            "incomplete_range_band",
+            [path for _, path in entries],
+            {role for role, _ in entries} == {"upper", "lower"},
+            "A range band needs one upper and one lower boundary",
+            axis_id,
+        )
+    valid = True
     try:
         ChartPlan(source_asset=asset, axes=axes, datasets=proposal.expand())
     except (ValidationError, ValueError):
-        issue(
-            "dataset_structure_invalid",
-            "Expanded Dataset names or Axis references violate ChartPlan rules",
-        )
+        valid = False
+    check(
+        "dataset_structure_invalid",
+        ["$"],
+        valid,
+        "Expanded Dataset names or Axis references must satisfy ChartPlan structural rules",
+    )
     return issues

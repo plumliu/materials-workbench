@@ -23,7 +23,7 @@ class ModelReply:
 
 
 class ModelCallError(RuntimeError):
-    """Safe diagnostic metadata, constructed without provider bodies or headers."""
+    """Provider diagnostics with credentials redacted by the transport."""
 
     def __init__(self, message: str, metadata: dict | None = None):
         super().__init__(message)
@@ -78,14 +78,33 @@ class QwenModel:
                 api_key=self._config.api_key.get_secret_value(),
                 base_url=base_url,
                 timeout=900,
-                max_retries=0,
+                max_retries=3,  # SDK exponential backoff for transient transport failures.
             ) as client:
                 response = client.chat.completions.create(**request)
         except OpenAIError as error:
-            # Only SDK type and numeric HTTP status; never stringify provider bodies.
             status = getattr(error, "status_code", None)
+            secret = self._config.api_key.get_secret_value()
+            response = getattr(error, "response", None)
+            details = str(error).replace(secret, "[REDACTED]")
+            body = (
+                response.text.replace(secret, "[REDACTED]")
+                if response is not None
+                else None
+            )
+            if body and body not in details:
+                details += "\n" + body
             raise ModelCallError(
-                f"Qwen transport failed: {type(error).__name__}, HTTP {status if isinstance(status, int) else 'unavailable'}"
+                f"Model transport failed: {type(error).__name__}, "
+                f"HTTP {status if isinstance(status, int) else 'unavailable'}: {details}",
+                {
+                    "exception_type": type(error).__name__,
+                    "status_code": status,
+                    "request_id": (getattr(error, "request_id", None) or "").replace(
+                        secret, "[REDACTED]"
+                    )
+                    or None,
+                    "response_body": body,
+                },
             ) from None
         text = response.choices[0].message.content if response.choices else None
         if not response.choices:
@@ -119,7 +138,7 @@ def check_model(image: Path, expected: str, output: Path) -> dict:
         opened.verify()
     config = load_model_config()
     directory = output.resolve() / uuid4().hex
-    directory.mkdir(parents=True, exist_ok=False)
+    directory.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     result = {
         "schema_version": "model-check/v1",
@@ -141,6 +160,8 @@ def check_model(image: Path, expected: str, output: Path) -> dict:
             if reply.text.strip() == expected and reply.model == config.model
             else "unexpected_response"
         )
+    except ModelCallError as error:
+        result.update(status="failed", error=str(error), **error.metadata)
     except (RuntimeError, ValueError):
         result.update(
             status="failed", error="Model check failed; provider details suppressed"

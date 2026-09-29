@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>材料手册工作台</title><link rel="stylesheet" href="/front_end/workbench.css"></head>
 <body><header><h1>材料手册工作台</h1></header>
-<main class="overview"><div class="heading"><div><p class="eyebrow">手册总览</p><h2>图像与表格，并行推进</h2><p class="muted">网页完成接收、人工处理与组装。模型处理由 Codex 启动并跟进。</p></div><label>当前手册 <select id="manual" aria-label="当前手册"></select></label></div>
+<main class="overview"><div class="heading"><div><p class="eyebrow">手册总览</p><h2>图像与表格，并行推进</h2><p class="muted">接收手册后即可手工标注图像，也可按图启动智能识别；表格处理由 Codex 跟进。</p></div><label>当前手册 <select id="manual" aria-label="当前手册"></select></label></div>
 <p id="message" role="status"></p><div id="empty" hidden class="card">请将手册 PDF 放入本仓库的 <code>pdfs/</code>，再刷新页面。也可以直接让 Codex 帮你放入。</div>
 <div id="content" hidden><section class="card intake"><div><h3>1 · 接收手册</h3><p id="intake-status" class="muted"></p></div><button id="intake" class="primary">开始 intake</button></section>
-<div class="branches"><section class="card"><span class="eyebrow">图像</span><h3>Axes / Datasets → 人工采点</h3><p id="figure-state" class="muted"></p><progress id="figure-progress" value="0" max="1"></progress><div id="figure-counts" class="counts"></div><a id="figures" class="button primary">进入图像标注</a></section>
+<div class="branches"><section class="card"><span class="eyebrow">图像</span><h3>直接手工标注 · 可选智能识别</h3><p id="figure-state" class="muted"></p><progress id="figure-progress" value="0" max="1"></progress><div id="figure-counts" class="counts"></div><a id="figures" class="button primary">进入图像标注</a></section>
 <section class="card"><span class="eyebrow">表格</span><h3>OCR / Luna → 人工核验</h3><p id="table-state" class="muted"></p><progress id="table-progress" value="0" max="1"></progress><div id="table-counts" class="counts"></div><a id="tables" class="button primary">进入表格核验</a></section></div>
 <section class="card assembly"><div><h3>最后 · 组装 library</h3><p class="muted">已确认的人工修订将在组装时应用。重复组装会更新本手册的成品目录。</p><label><input type="checkbox" id="incomplete"> 允许带未完成项组装，并在成品中记录完成情况</label><p id="assembly-status" role="status"></p><ul id="assembly-reasons"></ul><p id="assembly-hint" class="muted"></p><p id="assembly-result" class="muted"></p></div><button id="assemble" aria-describedby="assembly-status assembly-hint">组装手册</button></section>
 <details class="card" id="diagnostics"><summary id="issues-summary">问题详情与操作记录</summary><div class="issue-tools"><span class="muted">包含具体对象、页码、相关文件和下一步建议。</span><button id="copy-issues">复制给 Codex</button><span id="copy-status" role="status"></span></div><textarea id="copy-fallback" aria-label="问题详情，可全选复制" readonly hidden></textarea><div id="issues"></div></details></div></main>
@@ -75,8 +75,14 @@ function render() {
     const c = s[key];
     $(prefix + '-progress').max = Math.max(c.total, 1);
     $(prefix + '-progress').value = c.verified;
-    $(prefix + '-counts').textContent = `${c.total} 个项目 · ${c.ready} 个可人工处理 · ${c.verified} 个已确认`;
-    $(prefix + '-state').textContent = labels[s.tasks[key]?.status] || (s.intake ? '请让 Codex 启动处理' : '等待 intake');
+    const unit = key === 'figures' ? '张' : '项';
+    const counts = [`${c.ready} ${unit}${key === 'figures' ? '可标注' : '可核验'}`];
+    if (c.missing) counts.push(`另 ${c.missing} 项目录${key === 'figures' ? '图' : '表'}缺少来源`);
+    const pending = c.total - c.ready - c.missing;
+    if (pending > 0) counts.push(`另 ${pending} ${unit}尚未就绪`);
+    counts.push(`${c.verified} ${unit}已确认`);
+    $(prefix + '-counts').textContent = counts.join(' · ');
+    $(prefix + '-state').textContent = labels[s.tasks[key]?.status] || (s.intake ? (key === 'figures' ? '打开单页 PDF 即可手标，也可在图内点击智能识别' : '请让 Codex 启动处理') : '等待 intake');
     $(key).href = '/' + key + '?' + new URLSearchParams({manual:selected});
     $(key).setAttribute('aria-disabled', !s.intake);
   }

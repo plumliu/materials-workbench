@@ -1028,8 +1028,6 @@ def process_mineru_results(*, run_dir: Path, force: bool = False) -> dict[str, A
         ):
             key += "__" + f"part_{len(candidates) + 1:03d}"
         artifact_dir = run_dir / f"Table_{key}"
-        if artifact_dir.exists() and not force:
-            raise FileExistsError(f"Table artifact already exists: {artifact_dir}; use --force")
         if (artifact_dir / "human_review.json").is_file():
             raise ValueError("This Table has human edits; reconcile explicitly before reprocessing")
         artifact_dir.mkdir(parents=True, exist_ok=True)

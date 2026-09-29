@@ -106,17 +106,21 @@ def project(plan: ChartPlan, calibration: Calibration) -> dict:
 
 
 def export(path: Path, plan: ChartPlan, calibration: Calibration, image: Path) -> None:
-    data = project(plan, calibration)
+    write_archive(path, project(plan, calibration), image)
+
+
+def write_archive(path: Path, data: dict, image: Path) -> None:
+    """Write a native single-source WPD project, including an unmarked PDF."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    info = {"version": [4, 0], "json": "wpd.json", "images": ["figure.png"]}
-    with tarfile.open(path, "x", format=tarfile.USTAR_FORMAT) as archive:
+    info = {"version": [4, 0], "json": "wpd.json", "images": [image.name]}
+    with tarfile.open(path, "w", format=tarfile.USTAR_FORMAT) as archive:
         for name, content in (
             ("info.json", json.dumps(info).encode()),
             (
                 "wpd.json",
                 json.dumps(data, ensure_ascii=False, allow_nan=False).encode(),
             ),
-            ("figure.png", image.read_bytes()),
+            (image.name, image.read_bytes()),
         ):
             member = tarfile.TarInfo("chart/" + name)
             member.size = len(content)

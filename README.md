@@ -23,7 +23,9 @@ uv run materials-workbench apply-luna "手册名"
 uv run materials-workbench assemble "手册名"
 ```
 
-`figures` 与 `tables` 可以同时运行。Luna 由 Codex 按根目录合同派发 `gpt-6-luna`、`xhigh` 子代理；完成一个批次就可以执行 `apply-luna`，发布已就绪的逻辑表。单图重试用 `figures "手册名" --figure Figure_编号 --retry`，已有人工 TAR 不会被模型覆盖。
+`figures` 与 `tables` 可以同时运行。Luna 由 Codex 按根目录合同派发 `gpt-6-luna`、`xhigh` 子代理；完成一个批次就可以执行 `apply-luna`，发布已就绪的逻辑表。Codex 的单图重试用 `figures "手册名" --figure Figure_编号 --retry`，默认保留已有人工 TAR。网页则可直接打开单页 PDF 手标；“智能识别当前图”经清空确认后替换该图全部标注，支持不同 Figure 并行识别。
+
+可再生的中间 JSON、渲染图、模型请求与响应、模型导出 TAR 和组装产物允许重跑覆盖；JSON 使用原子替换，失败摘要随本次运行更新。同一来源 PDF 的 intake 可以重跑。人工修订版本、来源变化与并发操作仍需通过原有检查。
 
 配置统一在根目录 `.env`；新建环境时复制 `.env.example` 并在编辑器填写。Git 追踪代码、文档、依赖清单和不含密钥的 `.env.example`。`pdfs/`、`figure_assets/`、`runs/`、`library/` 各自仅追踪 `.gitkeep` 占位文件，目录内的手册数据和产物均忽略；`.env`、依赖环境与缓存也不追踪。
 
@@ -39,3 +41,5 @@ uv run materials-workbench assemble "手册名"
 - [架构与产物](docs/INTEGRATION_PLAN.md)、[Luna 合同](LUNA_TABLE_REVIEW_CONTRACT.md)、[组装合同](PDF_TREE_CONTRACT.md)。
 
 运行检查：`uv run pytest tests -q`、`uv run ruff check src tests`。离线测试不会调用付费服务；完整手册回归需要本机 `pdfs/` 中的两本材料手册，否则自动跳过。
+
+模型接口临时故障使用 SDK 指数退避：首次失败后最多重试 3 次（总计最多 4 次请求），默认等待约 0.5、1、2 秒并带随机抖动，优先遵循 SDK 支持的服务端重试提示。重试耗尽后保留最终完整错误（密钥脱敏）；模型输出校验继续使用既有修复流程。

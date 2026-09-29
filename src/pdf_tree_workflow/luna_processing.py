@@ -101,10 +101,8 @@ def plan_luna_batches(
         batches.append(current)
 
     batch_root = run_dir / "luna_batches"
-    if batch_root.exists() and force:
+    if batch_root.exists():
         shutil.rmtree(batch_root)
-    if batch_root.exists() and any(batch_root.iterdir()):
-        raise FileExistsError(f"Luna batch directory is not empty: {batch_root}; use --force")
     batch_root.mkdir(parents=True, exist_ok=True)
     preview_dir = batch_root / "pages"
     preview_dir.mkdir(exist_ok=True)

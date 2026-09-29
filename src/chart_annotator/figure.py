@@ -29,7 +29,7 @@ def ingest_figure(source: Path, output: Path, *, context: dict | None = None) ->
         size = image_dimensions(source)
     digest = context["source_id"] if context else source.stem
     directory = output.resolve() if context else output.resolve() / source.stem
-    directory.mkdir(parents=True, exist_ok=False)
+    directory.mkdir(parents=True, exist_ok=True)
     target = directory / f"source{source.suffix.lower()}"
     if context:
         target = source
@@ -56,7 +56,7 @@ def ingest_figure(source: Path, output: Path, *, context: dict | None = None) ->
 def render_figure(directory: Path, asset: SourceAsset) -> tuple[SourceAsset, Path]:
     source = directory / asset.path
     render = directory / "render"
-    render.mkdir(exist_ok=False)
+    render.mkdir(exist_ok=True)
     path = render / "figure.png"
     matrix = None
     if asset.kind == "pdf":

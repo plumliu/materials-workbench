@@ -89,8 +89,7 @@ def test_intake_parallel_table_processing_and_final_assembly(tmp_path, monkeypat
     assert (tmp_path / "figure_assets/Manual/_page_review/page_0002.pdf").exists()
     assert read_json(run / "manual.json")["figures"][0]["id"] == "Figure_1.2"
     assert not list(run.rglob("*sha256*"))
-    with pytest.raises(ValueError, match="已有"):
-        workflow.execute(tmp_path, "Manual", "intake")
+    assert workflow.execute(tmp_path, "Manual", "intake")["figures"] == 1
 
     def fake_ocr(*, run_dir, **kwargs):
         for segment in read_json(run_dir / "segments.json"):
@@ -151,6 +150,7 @@ def test_intake_parallel_table_processing_and_final_assembly(tmp_path, monkeypat
     result = workflow.execute(tmp_path, "Manual", "assemble", allow_incomplete=True)
     assert Path(result["output"]).is_dir()
     assert read_json(tmp_path / "library/Manual/REVIEW_STATUS.json")["incomplete"]
+    assert workflow.execute(tmp_path, "Manual", "assemble", allow_incomplete=True)["output"] == result["output"]
 
 
 def test_overview_distinguishes_catalog_pages_and_content_pages(tmp_path):
@@ -184,12 +184,11 @@ def test_overview_distinguishes_catalog_pages_and_content_pages(tmp_path):
     assert [i["page"] for i in missing] == [None, 4]
     assert missing[0]["catalog_pages"] == [1]
     assert str(run / "tables/manifest.json") in missing[0]["files"]
-    tar_issue = next(i for i in state["issues"] if i["code"] == "figure_tar_missing")
-    assert tar_issue["subject"] == "Figure_1.2" and tar_issue["page"] == 3
+    assert not any(i["code"] == "figure_tar_missing" for i in state["issues"])
     assert state["figures"] == {
         "total": 3,
         "missing": 2,
-        "ready": 0,
+        "ready": 1,
         "verified": 0,
         "failed": 0,
     }
@@ -308,7 +307,6 @@ def test_incremental_luna_application_keeps_prior_formula_results(
     plan = plan_luna_batches(
         run_dir=tables,
         contract=tmp_path / "LUNA_TABLE_REVIEW_CONTRACT.md",
-        force=True,
         max_tables=1,
     )
     for number, batch in enumerate(plan["batches"], 1):
@@ -390,3 +388,92 @@ def test_catalog_omissions_do_not_drop_intake_figures(tmp_path):
     assert len(parsed.nodes) == 2
     assert parsed.nodes[1].parent is parent
     assert parsed.nodes[1].source_pages == [3]
+
+
+def test_pdf_manual_annotation_and_parallel_figure_recognition(tmp_path, monkeypatch):
+    import time
+    from threading import Event
+    from chart_annotator.wpd import write_archive
+
+    run = prepared(tmp_path)
+    data = read_json(run / "manual.json")
+    second = {"id": "Figure_1.6", "page": 4, "caption": "Second Figure"}
+    data["figures"].append(second)
+    write_json(run / "manual.json", data)
+    assets = tmp_path / "figure_assets/Manual"
+    (assets / second["id"]).mkdir()
+    shutil.copyfile(assets / "_page_review/page_0004.pdf", assets / second["id"] / "Figure_1.6.pdf")
+    entered = {item["id"]: Event() for item in data["figures"]}
+    release = {key: Event() for key in entered}
+    empty = {"version": [4, 2], "axesColl": [], "datasetColl": [], "measurementColl": []}
+    upload = tmp_path / "upload.tar"
+
+    def fake_run(source, output, **options):
+        ident = options["thread_id"]
+        assert options["datasets"] is True
+        entered[ident].set()
+        assert release[ident].wait(10)
+        if ident == second["id"]:
+            return {"status": "failed", "issues": [{"message": "test provider failure"}]}
+        write_archive(output / "output/chart.tar", empty, source)
+        return {"status": "exported"}
+
+    monkeypatch.setattr("chart_annotator.runner.run_figure", fake_run)
+    with service(tmp_path) as base:
+        def infos():
+            return {i["id"]: i for i in json.load(urlopen(base + "/api/figures?manual=Manual"))}
+
+        def recognize(item, **extra):
+            return json.load(urlopen(Request(base + "/api/figure-recognize?" + urlencode({"manual": "Manual", "id": item["id"]}),
+                data=json.dumps({"confirm_reset": True, "version": item["version"], **extra}).encode(),
+                headers={"Content-Type": "application/json"})))
+
+        def save(item, payload):
+            return json.load(urlopen(Request(base + "/api/figure-save?" + urlencode({
+                "manual": "Manual", "id": item["id"], "version": json.dumps(item["version"]), "status": "draft"}),
+                data=payload, headers={"Content-Type": "application/x-tar"})))
+
+        first = infos()["Figure_1.2"]
+        assert first["can_annotate"] and not first["ready"] and first["version"] is None
+        source = assets / first["id"] / (first["id"] + ".pdf")
+        assert urlopen(base + "/api/figure-pdf?manual=Manual&id=Figure_1.2").read() == source.read_bytes()
+        write_archive(upload, empty, source)
+        payload = upload.read_bytes()
+        # First manual save needs no model run and no preexisting TAR.
+        first = save(first, payload)
+        assert first["review_status"] == "draft"
+        with pytest.raises(HTTPError) as error:
+            recognize(first, confirm_reset=False)
+        assert error.value.code == 409
+        try:
+            assert recognize(first)["processing"]["status"] == "running"
+            assert entered[first["id"]].wait(3)
+            assert infos()[first["id"]]["processing"]["status"] == "running"
+            for operation in (lambda: recognize(first), lambda: save(first, payload)):
+                with pytest.raises(HTTPError) as error:
+                    operation()
+                assert error.value.code == 409
+            for action in ("intake", "assemble", "figures"):
+                with pytest.raises(ValueError, match="正在进行"):
+                    workflow.execute(tmp_path, "Manual", action)
+            other = infos()[second["id"]]
+            write_archive(upload, empty, assets / other["id"] / (other["id"] + ".pdf"))
+            other = save(other, upload.read_bytes())
+            assert other["review_status"] == "draft"
+            recognize(other)
+            assert entered[other["id"]].wait(3)  # first is still blocked: independent jobs
+        finally:
+            for event in release.values():
+                event.set()
+        for _ in range(100):
+            latest = infos()
+            if all(i["processing"]["status"] != "running" for i in latest.values()):
+                break
+            time.sleep(.02)
+        assert latest[first["id"]]["processing"]["status"] == "exported"
+        assert latest[other["id"]]["processing"]["status"] == "failed"
+        assert latest[other["id"]]["review_status"] == "unreviewed"
+        assert read_tar(assets / other["id"] / (other["id"] + ".tar"))[0] == empty
+        with pytest.raises(HTTPError):
+            save(first, payload)  # before-reset revision can never restore old annotations
+        assert save(latest[other["id"]], upload.read_bytes())["review_status"] == "draft"

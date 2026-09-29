@@ -78,6 +78,5 @@ def run_figure(
     }
     if result.get("run_dir"):
         report = Path(result["run_dir"]) / "audit/summary.json"
-        if not report.exists():
-            write_json(report, summary)
+        write_json(report, summary)
     return summary

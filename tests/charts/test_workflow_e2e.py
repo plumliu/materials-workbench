@@ -126,26 +126,6 @@ def chart_pdf(path, figure_id="1.2"):
         pdf.save(path)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def test_real_local_evidence_fake_model_complete_graph(tmp_path):
     source = tmp_path / "chart.pdf"
     chart_pdf(source)
@@ -212,6 +192,11 @@ def test_dataset_planning_is_explicitly_enabled(tmp_path):
     assert [dataset["name"] for dataset in project["datasetColl"]] == [
         "Stress | filled circle"
     ]
+    # Replay all generated artifacts, including model records, context and TAR.
+    repeated = run_figure(source, tmp_path / "output", model=FakeChartModel(), datasets=True)
+    assert repeated["status"] == "exported", repeated
+    assert json.loads((Path(repeated["run_dir"]) / "audit/summary.json").read_text())["status"] == "exported"
+
 
 
 def test_model_failure_is_sanitized_and_never_exports(tmp_path):
@@ -238,6 +223,13 @@ def test_model_failure_is_sanitized_and_never_exports(tmp_path):
         request(FailedModel(), "axes", evidence, image, tmp_path / "model")
     assert "secret" not in (tmp_path / "model/failure.json").read_text()
 
+    class RecoveredModel:
+        def complete(self, messages):
+            return ModelReply('{"groups":[],"unresolved":[]}', "fake", 1, "stop")
+
+    request(RecoveredModel(), "axes", evidence, image, tmp_path / "model")
+    assert not (tmp_path / "model/failure.json").exists()
+    assert (tmp_path / "model/response.json").exists()
 
 
 
@@ -484,6 +476,19 @@ def test_dataset_repair_revalidates_after_calibration_and_preserves_attempts(tmp
     assert len(model.calls) == 5
     assert not model.calls[3].get("issues")
     assert model.calls[4]["issues"][0]["code"] == "marker_name_incomplete"
+    report = model.calls[4]["validation_report"]
+    assert report["scope"] == "structural_checks_only"
+    assert report["target"] == "previous"
+    assert model.calls[4]["previous"]["datasets"][0]["name"] == "Stress"
+    assert "validation_report" not in model.calls[3]
+    failed = [c for c in report["checks"] if c["status"] == "failed"]
+    assert [(c["rule"], c["paths"]) for c in failed] == [
+        ("marker_name_incomplete", ["datasets[0].name"])
+    ]
+    assert any(
+        c["paths"] == ["datasets[0].axis"] and c["status"] == "passed"
+        for c in report["checks"]
+    )
     directory = Path(result["run_dir"])
     assert (directory / "attempts/e0_s0/dataset_validation.json").exists()
     assert not (directory / "attempts/e0_s0_d1/dataset_validation.json").exists()
