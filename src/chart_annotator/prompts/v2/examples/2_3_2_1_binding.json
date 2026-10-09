@@ -12,10 +12,10 @@
     "900"
   ],
   "tasks": [
-    "binding"
+    "grounding"
   ],
-  "binding_lesson": "The reviewed human WPD TAR establishes the 500-900 F and 20-80 ksi mappings. The coordinates below place four visible values on the corresponding vector T intersections in the same full render, correcting the few-pixel human click offsets. Coordinates are normalized from the complete 732 by 726 image. X anchors share one horizontal baseline and Y anchors share one vertical spine; never use the printed-number centers.",
-  "binding_input": {
+  "grounding_lesson": "The reviewed human WPD TAR establishes the 500-900 F and 20-80 ksi mappings. The coordinates below place four visible values on the corresponding vector T intersections in the same full render, correcting the few-pixel human click offsets. Coordinates are normalized from the complete 732 by 726 image. X anchors share one horizontal baseline and Y anchors share one vertical spine; never use the printed-number centers.",
+  "grounding_input": {
     "structure": {
       "groups": [
         {
@@ -37,7 +37,7 @@
       726
     ]
   },
-  "binding_output": {
+  "grounding_output": {
     "schema_version": "grounding/v3",
     "coordinate_system": "normalized_0_1000",
     "groups": [

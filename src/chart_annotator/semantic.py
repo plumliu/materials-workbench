@@ -2,7 +2,6 @@
 
 import json
 import re
-import time
 import unicodedata
 from pathlib import Path
 
@@ -24,10 +23,7 @@ from chart_annotator.domain.workflow import (
     Grounding,
     GroundingResponse,
     Structure,
-    VisualReview,
 )
-from chart_annotator.intake import write_json
-from chart_annotator.qwen import ModelCallError, VisionLanguageModel, image_message
 
 PROMPTS = Path(__file__).parent / "prompts/v2"
 
@@ -36,6 +32,7 @@ PROMPTS = Path(__file__).parent / "prompts/v2"
 AXIS_EXAMPLE_FILES = (
     "3_2_1_1.json",  # broken numeric X and side-specific Y mappings
     "3_2_1_7.json",  # categorical X and a shared 110/30 boundary
+    "3_2_1_11.json",  # same-unit left/right scales with different origins
     "3_2_1_6.json",  # four spatially independent coordinate frames
     "3_5_1_1.json",  # logarithmic X with vertically separate Y mappings
     "3_2_7_2_3.json",  # two complete unit systems in one physical frame
@@ -187,9 +184,9 @@ def compact_grounding(
 
 def task_evidence(task: str, evidence: Evidence) -> dict:
     """Send each model node only the text it can act on."""
-    if task in ("visual-review", "failed-axis-review"):
-        return {"image_size": evidence.geometry.image_size}
-    if task in ("axes", "axes-repair"):
+    if task not in {"axes", "grounding", "datasets"}:
+        raise ValueError(f"Unknown model stage: {task}")
+    if task == "axes":
         return {
             "visible_text": list(
                 dict.fromkeys(
@@ -199,7 +196,7 @@ def task_evidence(task: str, evidence: Evidence) -> dict:
                 )
             )
         }
-    if task in ("datasets", "datasets-repair"):
+    if task == "datasets":
         return {
             "legend_and_caption_text": list(
                 dict.fromkeys(
@@ -243,21 +240,13 @@ def dataset_example_output(example: dict) -> dict:
     }
 
 
-def system_prompt() -> str:
-    """Return the shared contract and handbook context used by every Qwen node."""
-    return "\n\n".join(
-        (PROMPTS / name).read_text(encoding="utf-8").strip()
-        for name in ("system.md", "materials-context.md")
-    )
-
-
-def select_examples(
-    evidence: Evidence, image: Path, *, task: str | None = None
-) -> list[dict]:
+def select_examples(evidence: Evidence, *, task: str) -> list[dict]:
     """Select reviewed examples for the requested protocol node."""
+    if task not in {"axes", "grounding", "datasets"}:
+        raise ValueError(f"Unknown model stage: {task}")
     text = " ".join(t.normalized_text for t in evidence.texts)
     normalized = "".join(text.casefold().split())
-    if task in ("datasets", "datasets-repair"):
+    if task == "datasets":
         selected = []
         for filename, clean_image in DATASET_EXAMPLE_FILES.items():
             example = json.loads(
@@ -276,27 +265,14 @@ def select_examples(
     examples = []
     for path in sorted((PROMPTS / "examples").glob("*.json")):
         example = json.loads(path.read_text(encoding="utf-8"))
-        supported_tasks = example.get("tasks")
-        if supported_tasks is not None and task not in supported_tasks:
-            continue
-        same_figure = evidence.source_id in example["source_ids"] or (
-            example.get("figure_id")
-            and re.search(
-                r"figure" + re.escape(example["figure_id"]) + r"(?!\d)", normalized
-            )
-        )
-        if same_figure and task not in ("axes", "axes-repair", "binding"):
+        if task not in example["tasks"]:
             continue
         score = sum(
             "".join(cue.casefold().split()) in normalized
             for cue in example["selection_cues"]
         )
-        if task in ("axes", "axes-repair") and "axis_output" not in example:
-            continue
-        if task == "binding" and "binding_output" not in example:
-            continue
         examples.append((score, path.name, example))
-    if task in ("axes", "axes-repair"):
+    if task == "axes":
         by_filename = {filename: example for _, filename, example in examples}
         return [
             by_filename[filename]
@@ -305,177 +281,8 @@ def select_examples(
         ]
 
     examples.sort(key=lambda item: (-item[0], item[1]))
-    # Binding keeps both reviewed coordinate examples.
-    limit = None if task == "binding" else 2
-    selected = examples[:limit] if limit is not None else examples
-    return [example for _, _, example in selected]
-
-
-def request(
-    model: VisionLanguageModel,
-    task: str,
-    evidence: Evidence,
-    image: Path,
-    directory: Path,
-    structure: AxisStructure | Structure | None = None,
-    issues: list[ValidationIssue] | None = None,
-    grounding: Grounding | None = None,
-    review_context: dict | None = None,
-    previous_datasets: DatasetStructure | None = None,
-    validation_report: dict | None = None,
-):
-    structural = task in ("axes", "axes-repair", "datasets", "datasets-repair")
-    grounding_task = task in ("binding", "repair", "failed-axis-review")
-    schema = (
-        AxisStructure
-        if task in ("axes", "axes-repair")
-        else DatasetStructure
-        if task in ("datasets", "datasets-repair")
-        else VisualReview
-        if task == "visual-review"
-        else GroundingResponse
-        if grounding_task
-        else Grounding
-    )
-    payload = {
-        "evidence": task_evidence(task, evidence),
-        "schema": schema.model_json_schema(),
-    }
-    if structure is not None:
-        if task in ("datasets", "datasets-repair"):
-            payload["axes"] = compact_axes(structure.axes)
-        elif grounding_task:
-            payload["structure"] = compact_grounding_structure(structure)
-        else:
-            payload["structure"] = structure.model_dump(mode="json")
-    if previous_datasets is not None:
-        payload["previous"] = previous_datasets.model_dump(mode="json")
-    if grounding is not None:
-        payload["grounding"] = (
-            compact_grounding(grounding, structure).model_dump(mode="json")
-            if grounding_task and structure is not None
-            else grounding.model_dump(mode="json")
-        )
-    if review_context is not None:
-        payload["review_context"] = review_context
-    if issues:
-        payload["issues"] = [i.model_dump(mode="json") for i in issues]
-    if validation_report is not None:
-        payload["validation_report"] = validation_report
-    instructions = (PROMPTS / f"{task}-task.md").read_text(encoding="utf-8")
-    if task in ("datasets", "datasets-repair"):
-        instructions = (
-            (PROMPTS / "dataset-contract.md").read_text(encoding="utf-8")
-            + "\n"
-            + instructions
-        )
-    prompt = (
-        instructions
-        + "\n"
-        + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    )
-    system = system_prompt()
-    messages = [{"role": "system", "content": system}]
-    examples = (
-        select_examples(evidence, image, task=task)
-        if structural or task == "binding"
-        else []
-    )
-    for example in examples:
-        if task in ("axes", "axes-repair"):
-            lesson = example["axis_lesson"]
-            example_input = example["input"]
-            example_output = example["axis_output"]
-        elif task == "binding":
-            lesson = example["binding_lesson"]
-            example_input = example["binding_input"]
-            example_output = example["binding_output"]
-        elif task in ("datasets", "datasets-repair"):
-            lesson = example["lesson"]
-            example_input = {
-                "axes": compact_axes(
-                    [
-                        AxisPlan.model_validate(axis)
-                        for axis in example["output"]["axes"]
-                    ]
-                )
-            }
-            example_output = dataset_example_output(example)
-        else:
-            lesson = example["lesson"]
-            example_input = example["input"]
-            example_output = example["output"]
-        messages.extend(
-            image_message(
-                PROMPTS / "examples" / example["image"],
-                "REFERENCE EXAMPLE ONLY. "
-                + lesson
-                + "\n"
-                + json.dumps(example_input, ensure_ascii=False),
-            )
-        )
-        messages.append(
-            {
-                "role": "assistant",
-                "content": json.dumps(
-                    example_output,
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ),
-            }
-        )
-    messages.extend(image_message(image, prompt))
-    write_json(
-        directory / "request.json",
-        {
-            "protocol": "qwen/v2",
-            "task": task,
-            "system": system,
-            "payload": payload,
-            "instructions": instructions,
-            "example_files": [example["image"] for example in examples],
-            "image_size": evidence.geometry.image_size,
-        },
-    )
-    for name in ("failure.json", "response.json", "validated_response.json", "expanded_grounding.json"):
-        (directory / name).unlink(missing_ok=True)
-    started = time.perf_counter()
-    try:
-        reply = model.complete(messages)
-    except RuntimeError as error:
-        safe = (
-            str(error) if isinstance(error, ModelCallError) else "Model adapter failed"
-        )
-        metadata = error.metadata if isinstance(error, ModelCallError) else {}
-        write_json(
-            directory / "failure.json", {"status": "failed", "error": safe, **metadata}
-        )
-        if isinstance(error, ModelCallError):
-            raise
-        raise RuntimeError("Model request failed; see sanitized failure.json") from None
-    write_json(
-        directory / "response.json",
-        {
-            "text": reply.text,
-            "model": reply.model,
-            "total_tokens": reply.total_tokens,
-            "finish_reason": reply.finish_reason,
-            "elapsed_seconds": round(time.perf_counter() - started, 3),
-        },
-    )
-    # Strict JSON; no eval, code execution, coordinate extraction or fuzzy repair.
-    text = reply.text.strip()
-    if text.startswith("```json\n") and text.endswith("```"):
-        text = text[8:-3].strip()
-    result = schema.model_validate_json(text)
-    if grounding_task:
-        if structure is None:
-            raise ValueError("Grouped grounding requires an approved Axis structure")
-        write_json(
-            directory / "validated_response.json", result.model_dump(mode="json")
-        )
-        return expand_grounding(result, structure)
-    return result
+    # Grounding keeps both reviewed coordinate examples.
+    return [example for _, _, example in examples]
 
 
 def _record_check(checks, rule, paths, passed, requirement):
@@ -517,12 +324,6 @@ def validate_axes(
         ["groups"],
         bool(structure.groups),
         "At least one Axis group is required",
-    )
-    check(
-        "axis_unresolved",
-        ["unresolved"],
-        not structure.unresolved,
-        "The proposal's unresolved list must be empty",
     )
     placeholder = re.compile(
         r"\b(?:axis|dataset|curve)[_ ]\d+\b|<[^>]+>|\.\.\.|…|图片文字不清",
@@ -620,12 +421,6 @@ def validate_datasets(
         ["datasets"],
         bool(proposal.datasets),
         "At least one visible Dataset is required",
-    )
-    check(
-        "dataset_unresolved",
-        ["unresolved"],
-        not proposal.unresolved,
-        "The proposal's unresolved list must be empty",
     )
     axis_ids = {axis.id for axis in axes}
     used_axes = {dataset.axis for dataset in proposal.datasets}

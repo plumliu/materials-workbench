@@ -49,29 +49,37 @@ class GraphState(TypedDict, total=False):
     validated_chart_plan: str
     calibration_plan: str
     calibration_review_sheet: str
-    failure_review_sheet: str
-    failure_axis_ids: list[str]
-    failure_review_pending: bool
-    failure_review: str
-    visual_review: str
-    visual_review_status: Literal["pending", "consistent", "corrected", "blocked"]
-    reviewed_calibration: str
     validation_issues: list[ValidationIssue]
-    structure_validation_report: dict
     repair_attempts: dict[str, int]
     evidence_preprocessing: Literal["original", "alternative"]
     output_artifacts: list[str]
     skipped_axes: str
     skipped_datasets: str
+    workflow_protocol: str
+    active_stage: str
+    stage_messages: dict
+    stage_data: dict
+    pending_tool_call: dict | None
+    pending_completion: str | None
+    model_turns: dict[str, int]
+    grounding_submissions: int
+    calibration_revision: int
+    request_context: dict
+    confirmed_calibration_revision: int | None
+    stage_outcome: str
 
 
 FIGURE_NODES = (
     "prepare_figure",
     "plan_axes",
+    "validate_axes_submission",
     "ground_axes",
     "snap_and_fit",
-    "review_calibration",
+    "retry_local_fit",
+    "finalize_partial_axes",
+    "validate_grounding_completion",
     "plan_datasets",
+    "validate_dataset_submission",
     "export_and_validate",
 )
 Node = Callable[[GraphState], GraphState]
@@ -79,7 +87,9 @@ Node = Callable[[GraphState], GraphState]
 
 def ingest_figure(state: GraphState) -> GraphState:
     directory, asset = figure.ingest_figure(
-        Path(state["input_path"]), Path(state["output_dir"]), context=state.get("source_context")
+        Path(state["input_path"]),
+        Path(state["output_dir"]),
+        context=state.get("source_context"),
     )
     return {
         "run_dir": str(directory),
@@ -122,6 +132,12 @@ def guarded(name: str, node: Node) -> Node:
                     ),
                 ],
             }
+            if name in {"plan_axes", "ground_axes", "plan_datasets"}:
+                result["active_stage"] = {
+                    "plan_axes": "axes",
+                    "ground_axes": "grounding",
+                    "plan_datasets": "datasets",
+                }[name]
         status: NodeStatus = "completed"
         if result.get("status") == "failed":
             status = "failed"
@@ -249,7 +265,9 @@ def reconcile_text_evidence(state: GraphState) -> GraphState:
 
 def prepare_figure(state: GraphState) -> GraphState:
     """Ingest, render and build canonical evidence as one resumable local stage."""
-    current = {**state, **ingest_figure(state)}
+    from chart_annotator.tool_workflow import PROTOCOL
+
+    current = {**state, **ingest_figure(state), "workflow_protocol": PROTOCOL}
     current.update(render_figure(current))
     if state.get("mode") == "render":
         return current
@@ -271,8 +289,10 @@ def build_workflow(
     checkpointer=None,
 ):
     """Credentials remain in the model closure, outside serializable graph state."""
+    from chart_annotator.tool_workflow import nodes as tool_nodes
+
     graph = StateGraph(GraphState)
-    nodes = stages.nodes(model)
+    nodes = tool_nodes(model)
     nodes["prepare_figure"] = prepare_figure
     if offline_nodes:
         unknown = offline_nodes.keys() - nodes.keys()
@@ -282,36 +302,93 @@ def build_workflow(
     for name, node in nodes.items():
         graph.add_node(name, guarded(name, node))
     graph.add_edge(START, "prepare_figure")
-    for name, following in zip(FIGURE_NODES, (*FIGURE_NODES[1:], END), strict=True):
-        if name == "review_calibration":
-            graph.add_conditional_edges(
-                name,
-                lambda state: (
+
+    def route(name, state):
+        if state.get("status") != "running":
+            return END
+        outcome = state.get("stage_outcome")
+        if name == "prepare_figure":
+            return "plan_axes"
+        if name == "plan_axes":
+            return (
+                "validate_axes_submission"
+                if state.get("pending_tool_call")
+                else "plan_axes"
+            )
+        if name == "validate_axes_submission":
+            return "ground_axes" if outcome == "accepted" else "plan_axes"
+        if name == "ground_axes":
+            if outcome == "finalize_partial_axes":
+                return "finalize_partial_axes"
+            return (
+                "snap_and_fit"
+                if state.get("pending_tool_call")
+                else "validate_grounding_completion"
+            )
+        if name in {"snap_and_fit", "retry_local_fit", "finalize_partial_axes"}:
+            if outcome == "finalize_partial_axes":
+                return "finalize_partial_axes"
+            return "retry_local_fit" if outcome == "retry_local_fit" else "ground_axes"
+        if name == "validate_grounding_completion":
+            if outcome == "accepted":
+                return (
                     "plan_datasets"
-                    if state.get("status") == "running"
-                    and state.get("datasets_enabled")
+                    if state.get("datasets_enabled")
                     else "export_and_validate"
-                    if state.get("status") == "running"
-                    else END
-                ),
-                ["plan_datasets", "export_and_validate", END],
+                )
+            return "ground_axes"
+        if name == "plan_datasets":
+            return (
+                "validate_dataset_submission"
+                if state.get("pending_tool_call")
+                else "export_and_validate"
+                if outcome == "accepted"
+                else "plan_datasets"
             )
-        elif name == "plan_datasets":
-            graph.add_conditional_edges(
-                name,
-                lambda state: (
-                    "export_and_validate" if state.get("status") == "running" else END
-                ),
-                ["export_and_validate", END],
-            )
-        elif name == "export_and_validate":
-            graph.add_edge(name, END)
-        else:
-            graph.add_conditional_edges(
-                name,
-                lambda state, destination=following: (
-                    destination if state.get("status") == "running" else END
-                ),
-                [following, END],
-            )
+        if name == "validate_dataset_submission":
+            return "export_and_validate" if outcome == "accepted" else "plan_datasets"
+        return END
+
+    destinations = {
+        "prepare_figure": ["plan_axes", END],
+        "plan_axes": ["validate_axes_submission", "plan_axes", END],
+        "validate_axes_submission": ["ground_axes", "plan_axes", END],
+        "ground_axes": [
+            "snap_and_fit",
+            "validate_grounding_completion",
+            "finalize_partial_axes",
+            END,
+        ],
+        "snap_and_fit": [
+            "retry_local_fit",
+            "ground_axes",
+            "finalize_partial_axes",
+            END,
+        ],
+        "retry_local_fit": [
+            "retry_local_fit",
+            "ground_axes",
+            "finalize_partial_axes",
+            END,
+        ],
+        "finalize_partial_axes": ["ground_axes", END],
+        "validate_grounding_completion": [
+            "ground_axes",
+            "plan_datasets",
+            "export_and_validate",
+            END,
+        ],
+        "plan_datasets": [
+            "validate_dataset_submission",
+            "plan_datasets",
+            "export_and_validate",
+            END,
+        ],
+        "validate_dataset_submission": ["plan_datasets", "export_and_validate", END],
+        "export_and_validate": [END],
+    }
+    for name in FIGURE_NODES:
+        graph.add_conditional_edges(
+            name, lambda state, n=name: route(n, state), destinations[name]
+        )
     return graph.compile(checkpointer=checkpointer)

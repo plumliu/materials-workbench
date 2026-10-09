@@ -2,6 +2,8 @@
 
 import math
 
+import numpy as np
+
 from chart_annotator.domain.models import ValidationIssue
 from chart_annotator.domain.workflow import (
     Bindings,
@@ -23,6 +25,105 @@ def outside_spine(text, direction, coordinate, side):
 
 def _coordinate_value(value: float, scale: str) -> float:
     return math.log10(value) if scale == "log" else value
+
+
+def _label_spacing_mapping(direction, scale, selection, points, ticks, texts, spine):
+    """Text spacing estimates slope; the only real station fixes absolute position."""
+    index = 0 if direction == "x" else 1
+    real = [p for p in points if ticks[p.tick_id].provenance == "tick_intersection"]
+    if len(real) != 1 or len(points) < 2:
+        raise ValueError(
+            "Label spacing needs one real intersection and two independent labels"
+        )
+    if any(ticks[p.tick_id].provenance == "label_projection" for p in points):
+        raise ValueError("Existing label projections cannot seed label spacing")
+    if scale == "log" and any(p.value <= 0 for p in points):
+        raise ValueError("Logarithmic labels must be positive")
+    observations = [texts[p.text_id] for p in points]
+    tolerance = max(2.0, 2 * spine.width)
+    if len({p.text_id for p in points}) != len(points) or len(
+        {p.value for p in points}
+    ) != len(points):
+        raise ValueError(
+            "Label spacing requires independent labels and distinct values"
+        )
+    if (
+        len({t.source for t in observations}) != 1
+        or len({tuple(t.font_names) for t in observations}) != 1
+    ):
+        raise ValueError("Label spacing cannot mix text sources or layouts")
+    heights = [t.bbox_px[3] - t.bbox_px[1] for t in observations if t.bbox_px]
+    if len(heights) != len(points) or max(heights) - min(heights) > tolerance:
+        raise ValueError("Label spacing requires consistent visible text boxes")
+    grounded = set(selection.grounded_tick_ids)
+    if (
+        len(grounded.intersection(p.tick_id for p in points)) < 2
+        or real[0].tick_id not in grounded
+    ):
+        raise ValueError("Two labels including the real station must be grounded")
+    values = np.asarray([_coordinate_value(p.value, scale) for p in points])
+    centers = np.asarray(
+        [(t.bbox_px[index] + t.bbox_px[index + 2]) / 2 for t in observations]
+    )
+    order = np.argsort(values)
+    differences = np.diff(centers[order])
+    if not (np.all(differences > 0) or np.all(differences < 0)):
+        raise ValueError("Numeric labels must have one monotonic spatial order")
+    slope, center_intercept = np.linalg.lstsq(
+        np.column_stack((values, np.ones(len(values)))), centers, rcond=None
+    )[0]
+    if (
+        not math.isfinite(slope)
+        or slope == 0
+        or abs(float(centers.max() - centers.min())) <= 2 * tolerance
+    ):
+        raise ValueError("Label spacing requires a finite well-separated mapping")
+    origin = real[0]
+    intercept = origin.pixel[index] - slope * _coordinate_value(origin.value, scale)
+    residuals = list(abs(centers - (slope * values + center_intercept)))
+    mapped = []
+    for point, text, value in zip(points, observations, values, strict=True):
+        coordinate = float(slope * value + intercept)
+        low, high = text.bbox_px[index], text.bbox_px[index + 2]
+        residuals.append(max(low - coordinate, 0.0, coordinate - high))
+        pixel = (
+            (coordinate, spine.coordinate)
+            if direction == "x"
+            else (spine.coordinate, coordinate)
+        )
+        mapped.append(
+            point.model_copy(
+                update={"pixel": origin.pixel if point is origin else pixel}
+            )
+        )
+    if not math.isfinite(intercept) or max(residuals) > tolerance:
+        raise ValueError(
+            "Label spacing conflicts with original text boxes or intervals"
+        )
+    mapped.sort(key=lambda p: p.pixel[index])
+    if mapped[-1].pixel[index] - mapped[0].pixel[index] <= 2 * tolerance:
+        raise ValueError("Label spacing endpoints are too close")
+    return {
+        "calibration_method": "anchored_label_spacing",
+        "spine_id": spine.id,
+        "slope": float(slope),
+        "intercept": float(intercept),
+        "tolerance_px": tolerance,
+        "max_residual_px": float(max(residuals)),
+        "points": mapped,
+        "endpoints": (mapped[0], mapped[-1]),
+    }
+
+
+def _fit_label_spacing(axis, direction, scale, selection, points, ticks, texts, spine):
+    return Fit(
+        axis_id=axis.id,
+        direction=direction,
+        scale=scale,
+        **_label_spacing_mapping(
+            direction, scale, selection, points, ticks, texts, spine
+        ),
+    )
 
 
 def fit_bindings(structure: Structure, bindings: Bindings, evidence: Evidence):
@@ -142,7 +243,28 @@ def fit_bindings(structure: Structure, bindings: Bindings, evidence: Evidence):
             # Snapping may discover a wider, text-confirmed T intersection after
             # its provisional pair. Re-select from all real intersections here;
             # projected labels validate the map but never define it.
-            real_points = [point for point in points if "_label_" not in point.tick_id]
+            if any(ticks[p.tick_id].provenance == "label_center" for p in points):
+                try:
+                    fits.append(
+                        _fit_label_spacing(
+                            axis,
+                            direction,
+                            scale,
+                            selection,
+                            points,
+                            ticks,
+                            texts,
+                            spine,
+                        )
+                    )
+                except ValueError as error:
+                    problem("label_spacing_invalid", str(error), [axis.id])
+                continue
+            real_points = [
+                point
+                for point in points
+                if ticks[point.tick_id].provenance == "tick_intersection"
+            ]
             endpoint_pairs = [
                 (first, second)
                 for position, first in enumerate(real_points)
@@ -282,6 +404,7 @@ def fit_bindings(structure: Structure, bindings: Bindings, evidence: Evidence):
                     axis_id=axis.id,
                     direction=direction,
                     scale=scale,
+                    calibration_method="tick_intersections",
                     spine_id=spine.id,
                     slope=float(slope),
                     intercept=float(intercept),

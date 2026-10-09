@@ -19,7 +19,22 @@ function failure(item) {
   const details = item.processing.issues?.map(issue => issue.message).join('\n') || item.processing.message || item.processing.error || '处理已中断';
   return `智能识别未完成：${details}。可继续手工标注，或重新识别。`;
 }
+function modelNotes() {
+  const notes = current?.processing?.unresolved || [], panel = $('model-notes');
+  const key = JSON.stringify([manual, current?.id, notes]);
+  if (panel.dataset.key === key) return;
+  panel.dataset.key = key;
+  panel.hidden = notes.length === 0;
+  panel.open = true;
+  $('model-notes-title').textContent = `模型待核对意见（${notes.length} 条）`;
+  $('model-notes-list').replaceChildren(...notes.map(text => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+}
 function state() {
+  modelNotes();
   const running = busy(current), changed = dirty();
   $('state').textContent = running ? '智能识别中' : changed ? '有未保存修改' :
     ({unreviewed:'未确认', draft:'草稿', verified:'已确认'}[current?.review_status] || '');
@@ -34,8 +49,8 @@ function state() {
 }
 function list() {
   const search = $('search').value.toLowerCase(), filter = $('filter').value;
+  const host = $('list'), scrollTop = host.scrollTop, buttons = [];
   $('counts').textContent = `${items.length} 张 · ${items.filter(i => busy(i)).length} 张识别中`;
-  $('list').replaceChildren();
   for (const item of items) {
     if (!(item.id + ' ' + item.caption).toLowerCase().includes(search) ||
         filter === 'ready' && (!item.can_annotate || busy(item)) ||
@@ -49,10 +64,14 @@ function list() {
     const detail = document.createElement('small');
     detail.textContent = `页 ${item.page} · ${busy(item) ? '智能识别中' : !item.can_annotate ? '来源缺失' :
       ({verified:'已确认', draft:'草稿', unreviewed:'可手工标注'}[item.review_status] || '可手工标注')}`;
+    if (item.processing?.unresolved?.length) detail.textContent += ` · ${item.processing.unresolved.length} 条模型意见`;
     button.append(title, detail);
     button.onclick = () => open(item).catch(e => message(e.message));
-    $('list').append(button);
+    buttons.push(button);
   }
+  // Polling must not move the list through browser scroll anchoring.
+  host.replaceChildren(...buttons);
+  host.scrollTop = scrollTop;
 }
 async function refresh() {
   if (!manual) return;

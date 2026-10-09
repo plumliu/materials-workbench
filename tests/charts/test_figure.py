@@ -8,7 +8,7 @@ from PIL import Image
 from chart_annotator.figure import ingest_figure, render_figure
 from chart_annotator.graph import build_workflow
 from chart_annotator.intake import run_intake
-from chart_annotator.qwen import ModelReply
+from test_workflow_e2e import tool_reply
 
 
 @pytest.mark.parametrize("rotation", [0, 90, 180, 270])
@@ -55,12 +55,10 @@ def test_image_preserves_pixels(tmp_path):
 
 def test_job_provenance_and_panel_free_figure_progress(tmp_path):
     class NoReadableAxisModel:
-        def complete(self, _messages):
-            return ModelReply(
-                '{"schema_version":"axis-structure/v3","groups":[],"unresolved":["No readable coordinate axes"]}',
-                "fake",
-                0,
-                "stop",
+        def complete(self, messages, **kwargs):
+            return tool_reply(
+                "submit_axes",
+                {"groups": [], "unresolved": ["No readable coordinate axes"]},
             )
 
     source = tmp_path / "page.pdf"
@@ -74,7 +72,20 @@ def test_job_provenance_and_panel_free_figure_progress(tmp_path):
     for mode, status in [("render", "render_complete"), ("figure", "needs_resolution")]:
         result = build_workflow(
             model=NoReadableAxisModel() if mode == "figure" else None
-        ).invoke({"input_path": str(job), "output_dir": str(tmp_path / mode), "mode": mode, "source_context": {"source_id": "page/Figure_1.2", "manual_id": "page", "figure_id": "1.2", "source_page": 1, "figure_job_id": "page/Figure_1.2"}})
+        ).invoke(
+            {
+                "input_path": str(job),
+                "output_dir": str(tmp_path / mode),
+                "mode": mode,
+                "source_context": {
+                    "source_id": "page/Figure_1.2",
+                    "manual_id": "page",
+                    "figure_id": "1.2",
+                    "source_page": 1,
+                    "figure_job_id": "page/Figure_1.2",
+                },
+            }
+        )
         assert result["status"] == status
         asset = result["source_asset"]
         assert asset.figure_id == "1.2" and asset.source_page == 1

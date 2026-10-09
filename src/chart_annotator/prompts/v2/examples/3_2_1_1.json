@@ -13,8 +13,7 @@
   ],
   "tasks": [
     "axes",
-    "axes-repair",
-    "binding"
+    "grounding"
   ],
   "input": {
     "visible_text": [
@@ -57,8 +56,8 @@
     ],
     "unresolved": []
   },
-  "binding_lesson": "The right-side Fty numbers are printed to the right of the plotting frame. Their grounding x is the dark right spine at 561/657 = 854/1000, not the number box near 890-921/1000. The As Rec'd state is left of a break and is not a numerical calibration anchor; use 1400, 1500 and 1600 on the numerical segment. All coordinates below are normalized from the complete 657 by 941 image.",
-  "binding_input": {
+  "grounding_lesson": "The right-side Fty numbers are printed to the right of the plotting frame. Their grounding x is the dark right spine at 561/657 = 854/1000, not the number box near 890-921/1000. The As Rec'd state is left of a break and is not a numerical calibration anchor; use 1400, 1500 and 1600 on the numerical segment. All coordinates below are normalized from the complete 657 by 941 image.",
+  "grounding_input": {
     "structure": {
       "groups": [
         {
@@ -88,7 +87,7 @@
       941
     ]
   },
-  "binding_output": {
+  "grounding_output": {
     "schema_version": "grounding/v3",
     "coordinate_system": "normalized_0_1000",
     "groups": [

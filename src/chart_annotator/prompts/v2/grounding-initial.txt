@@ -1,0 +1,7 @@
+CURRENT FIGURE. Locate anchors for this accepted structure and call submit_grounding.
+Accepted structure, in fixed group and direction order:
+{{GROUNDING_STRUCTURE_JSON}}
+Valid full direction addresses:
+{{DIRECTION_ADDRESSES_JSON}}
+Original image dimensions and relevant evidence:
+{{GROUNDING_EVIDENCE_JSON}}

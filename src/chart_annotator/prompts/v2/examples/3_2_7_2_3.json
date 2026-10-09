@@ -11,8 +11,7 @@
     "KIC - ksi(in)^1/2"
   ],
   "tasks": [
-    "axes",
-    "axes-repair"
+    "axes"
   ],
   "input": {
     "visible_text": [

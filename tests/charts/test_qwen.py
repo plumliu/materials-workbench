@@ -75,6 +75,62 @@ def test_fake_transport_configuration_and_redacted_error(monkeypatch):
     assert "synthetic-test-key" not in str(error.value)
 
 
+def test_adapter_preserves_native_tool_calls_and_reasoning_continuation(monkeypatch):
+    sent = {}
+
+    class Call:
+        def model_dump(self, **kwargs):
+            return {
+                "id": "native_call",
+                "type": "function",
+                "function": {"name": "submit_axes", "arguments": "{bad-json"},
+            }
+
+    class Client:
+        def __init__(self, **kwargs):
+            assert kwargs["max_retries"] == 3
+            self.chat = SimpleNamespace(completions=self)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def create(self, **kwargs):
+            sent.update(kwargs)
+            return SimpleNamespace(
+                model="fake",
+                usage=None,
+                choices=[
+                    SimpleNamespace(
+                        finish_reason="tool_calls",
+                        message=SimpleNamespace(
+                            content=None,
+                            tool_calls=[Call()],
+                            model_extra={
+                                "reasoning_details": [
+                                    {"id": "r1", "data": "continuation"}
+                                ]
+                            },
+                        ),
+                    )
+                ],
+            )
+
+    monkeypatch.setattr(qwen, "OpenAI", Client)
+    adapter = qwen.QwenModel(ModelConfig(api_key=SecretStr("test-key")))
+    reply = adapter.complete([], tools=[{"test": "schema"}], tool_choice="auto")
+    assert reply.text is None
+    assert reply.tool_calls[0]["function"]["arguments"] == "{bad-json"
+    assert reply.assistant_fields == {
+        "reasoning_details": [{"id": "r1", "data": "continuation"}]
+    }
+    assert sent["parallel_tool_calls"] is False
+    assert sent["tool_choice"] == "auto"
+    assert sent["tools"] == [{"test": "schema"}]
+
+
 @pytest.mark.parametrize("status", [503, 504])
 def test_provider_failure_body_survives_artifacts_and_graph(
     tmp_path, monkeypatch, status
@@ -86,7 +142,7 @@ def test_provider_failure_body_survives_artifacts_and_graph(
 
     from chart_annotator.domain.workflow import Evidence, Geometry
     from chart_annotator.graph import guarded
-    from chart_annotator.semantic import request
+    from chart_annotator.tool_workflow import PROTOCOL, model_node
 
     secret = "synthetic-provider-key"
     body = "<html>Upstream unavailable; diagnostic: " + secret + "</html>"
@@ -123,11 +179,26 @@ def test_provider_failure_body_survives_artifacts_and_graph(
         ),
         texts=[],
     )
+    (tmp_path / "evidence.json").write_text(
+        evidence.model_dump_json(), encoding="utf-8"
+    )
     result = guarded(
         "plan_axes",
-        lambda state: request(adapter, "axes", evidence, image, tmp_path / "model"),
-    )({})
-    failure = json.loads((tmp_path / "model/failure.json").read_text())
+        model_node("axes", adapter),
+    )(
+        {
+            "workflow_protocol": PROTOCOL,
+            "run_dir": str(tmp_path),
+            "rendered_figure": str(image),
+            "evidence_graph": str(tmp_path / "evidence.json"),
+            "source_asset": __import__(
+                "chart_annotator.domain.models", fromlist=["SourceAsset"]
+            ).SourceAsset(source_id="test", path=str(image), kind="image"),
+        }
+    )
+    failure = json.loads((tmp_path / "tools/axes.json").read_text(encoding="utf-8"))[
+        "events"
+    ][-1]
     assert failure["status_code"] == status
     assert failure["request_id"] == "request-test-123"
     assert failure["response_body"] == body.replace(secret, "[REDACTED]")
@@ -194,7 +265,7 @@ def test_incomplete_response_cannot_pass(monkeypatch, finish_reason, text):
 @pytest.mark.parametrize("statuses", [[503, 504, 429, 200], [503] * 4, [401]])
 def test_sdk_retries_transient_failures_with_exponential_backoff(monkeypatch, statuses):
     import httpx2
-    from openai import OpenAI, _base_client
+    from openai import _base_client
 
     calls, delays = [], []
 
@@ -223,11 +294,9 @@ def test_sdk_retries_transient_failures_with_exponential_backoff(monkeypatch, st
         )
 
     def client(**kwargs):
-        return OpenAI(
-            **kwargs, http_client=httpx2.Client(transport=httpx2.MockTransport(respond))
-        )
+        return httpx2.Client(transport=httpx2.MockTransport(respond), **kwargs)
 
-    monkeypatch.setattr(qwen, "OpenAI", client)
+    monkeypatch.setattr(qwen, "DefaultHttpxClient", client)
     monkeypatch.setattr(_base_client.time, "sleep", delays.append)
     monkeypatch.setattr(_base_client, "random", lambda: 0)
     model = qwen.QwenModel(
@@ -236,10 +305,13 @@ def test_sdk_retries_transient_failures_with_exponential_backoff(monkeypatch, st
         )
     )
     if statuses[-1] == 200:
-        assert model.complete([]).text == "ok"
+        reply = model.complete([])
+        assert reply.text == "ok"
+        assert reply.http_attempts == len(statuses)
     else:
         with pytest.raises(qwen.ModelCallError, match="upstream detail") as error:
             model.complete([])
+        assert error.value.metadata["http_attempts"] == len(statuses)
         assert error.value.metadata["status_code"] == statuses[-1]
     assert calls == statuses
     assert delays == ([0.5, 1.0, 2.0] if len(statuses) == 4 else [])

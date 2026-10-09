@@ -23,7 +23,7 @@ def test_graph_compiles_and_fails_closed_on_missing_stage_input():
     assert result["validation_issues"][0].node == "prepare_figure"
 
 
-def test_offline_figure_workflow_uses_seven_meaningful_stages():
+def test_offline_figure_workflow_uses_tool_boundaries():
     called = []
 
     def offline(name):
@@ -32,6 +32,14 @@ def test_offline_figure_workflow_uses_seven_meaningful_stages():
             return {
                 "status": "exported" if name == "export_and_validate" else "running",
                 "validation_issues": [],
+                "pending_tool_call": {"fake": True}
+                if name == "plan_axes"
+                or (name == "ground_axes" and called.count(name) == 1)
+                else None,
+                "stage_outcome": "accepted"
+                if name == "validate_axes_submission"
+                or name == "validate_grounding_completion"
+                else "completion",
             }
 
         return node
@@ -41,9 +49,11 @@ def test_offline_figure_workflow_uses_seven_meaningful_stages():
     assert called == [
         "prepare_figure",
         "plan_axes",
+        "validate_axes_submission",
         "ground_axes",
         "snap_and_fit",
-        "review_calibration",
+        "ground_axes",
+        "validate_grounding_completion",
         "export_and_validate",
     ]
     assert result["status"] == "exported"
@@ -102,11 +112,19 @@ def test_root_dotenv_is_the_configuration_source(tmp_path, monkeypatch):
     assert settings.extra_body == {}
     assert "test-secret-only" not in repr(settings) + settings.model_dump_json()
     assert "api_key" not in settings.model_dump()
-    env.write_text(env.read_text() + 'CHART_ANNOTATOR_EXTRA_BODY={"chat_template_kwargs":{"enable_thinking":true}}\n')
+    env.write_text(
+        env.read_text()
+        + 'CHART_ANNOTATOR_EXTRA_BODY={"chat_template_kwargs":{"enable_thinking":true}}\n'
+    )
     assert config.load_model_config().extra_body["chat_template_kwargs"][
         "enable_thinking"
     ]
-    env.write_text(env.read_text().replace('{"chat_template_kwargs":{"enable_thinking":true}}', '{"api_key":"test-secret-only"}'))
+    env.write_text(
+        env.read_text().replace(
+            '{"chat_template_kwargs":{"enable_thinking":true}}',
+            '{"api_key":"test-secret-only"}',
+        )
+    )
     with pytest.raises(ValueError, match="provider configuration") as error:
         config.load_model_config()
     assert "test-secret-only" not in str(error.value)

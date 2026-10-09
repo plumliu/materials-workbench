@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from chart_annotator.domain.workflow import Bindings, Evidence, Grounding
+from chart_annotator.domain.workflow import Bindings, Calibration, Evidence, Grounding
 from chart_annotator.intake import write_json
 from chart_annotator.snapping import to_pixels
 
@@ -53,6 +53,7 @@ def contact_sheet(
     evidence: Evidence,
     directory: Path,
     *,
+    calibration: Calibration,
     filename: str = "calibration_review.png",
     context_updates: dict | None = None,
 ) -> tuple[Path, dict]:
@@ -60,13 +61,47 @@ def contact_sheet(
         source = source.convert("RGB")
     width, height = source.size
     event_path = directory / "snap/snap_events.json"
-    events = (
-        json.loads(event_path.read_text(encoding="utf-8"))["events"]
+    snap_audit = (
+        json.loads(event_path.read_text(encoding="utf-8"))
         if event_path.exists()
-        else []
+        else {"events": []}
     )
+    events = snap_audit["events"]
     ticks = {t.id: t for t in evidence.geometry.ticks}
     texts = {t.id: t for t in evidence.texts}
+    fitted_points = {
+        (fit.axis_id, fit.direction, point.tick_id): point
+        for fit in calibration.fits
+        for point in fit.points
+    }
+    methods = []
+    for fit in calibration.fits:
+        item = {
+            "axis_id": fit.axis_id,
+            "direction": fit.direction,
+            "method": fit.calibration_method,
+        }
+        if fit.calibration_method == "anchored_label_spacing":
+            index = 0 if fit.direction == "x" else 1
+            centers = [
+                (texts[p.text_id].bbox_px[index] + texts[p.text_id].bbox_px[index + 2])
+                / 2
+                for p in fit.points
+            ]
+            values = [
+                math.log10(p.value) if fit.scale == "log" else p.value
+                for p in fit.points
+            ]
+            center_intercept = sum(
+                c - fit.slope * v for c, v in zip(centers, values, strict=True)
+            ) / len(centers)
+            item.update(
+                label_count=len(centers),
+                common_center_offset_px=center_intercept - fit.intercept,
+                residual_basis="label spacing and original bbox intervals",
+                additional_label_check=len(centers) > 2,
+            )
+        methods.append(item)
     points = []
     for axis in grounding.axes:
         for direction in ("x", "y"):
@@ -95,7 +130,9 @@ def contact_sheet(
                         "snapped_px": match["snapped_px"] if match else None,
                         "tick_id": match["tick_id"] if match else None,
                         "text_id": match["text_id"] if match else None,
-                        "snap_method": match.get("method") if match else None,
+                        "snap_method": ticks[match["tick_id"]].provenance
+                        if match
+                        else None,
                     }
                 )
     for axis in bindings.axes:
@@ -120,9 +157,19 @@ def contact_sheet(
                         "snapped_px": ticks[item.tick_id].intersection_px,
                         "tick_id": item.tick_id,
                         "text_id": item.text_id,
-                        "snap_method": "additional_tick",
+                        "snap_method": ticks[item.tick_id].provenance,
                     }
                 )
+    for point in points:
+        fitted = fitted_points.get(
+            (point["axis_id"], point["direction"], point["tick_id"])
+        )
+        if fitted is not None:
+            point["snapped_px"] = fitted.pixel
+        if point["snap_method"] == "label_center":
+            point["snap_method"] = (
+                "anchored_label_spacing" if fitted else "label_center"
+            )
     for index, point in enumerate(points, 1):
         point["number"] = index
     font = ImageFont.load_default(size=18)
@@ -153,7 +200,11 @@ def contact_sheet(
                 draw.line((x - 4, y + 4, x + 4, y - 4), fill="#ed8800", width=2)
             if snap is not None:
                 x, y = position(snap)
-                if item.get("snap_method") == "label_projection":
+                if item.get("snap_method") in {
+                    "label_projection",
+                    "anchored_label_spacing",
+                    "label_center",
+                }:
                     draw.polygon(
                         ((x, y - 9), (x + 9, y), (x, y + 9), (x - 9, y)),
                         outline="#8b3fd1",
@@ -203,6 +254,10 @@ def contact_sheet(
                 label += "  NOT SNAPPED"
             elif item.get("snap_method") == "label_projection":
                 label += "  label projection"
+            elif item.get("snap_method") == "anchored_label_spacing":
+                label += "  anchored label spacing"
+            elif item.get("snap_method") == "label_center":
+                label += "  candidate label center (NOT CALIBRATED)"
             elif item.get("snap_method") == "shared_axis_reuse":
                 label += "  reused shared axis"
             else:
@@ -219,7 +274,7 @@ def contact_sheet(
     draw = ImageDraw.Draw(header)
     draw.text(
         (16, 5),
-        "Orange X: grounding | Blue ring: local T | Purple diamond: label projection | Gray: displacement",
+        "Orange X: hint | Blue ring: real intersection | Purple diamond: label evidence | Gray: displacement",
         font=font,
         fill="black",
     )
@@ -284,6 +339,8 @@ def contact_sheet(
         "contact_sheet_resize": sheet_resize,
         "views": views,
         "points": points,
+        "calibration_methods": methods,
+        "label_source_rejections": snap_audit.get("label_source_rejections", []),
     }
     if context_updates:
         context.update(context_updates)

@@ -1,0 +1,2 @@
+CURRENT FIGURE. Identify its coordinate presentations and call submit_axes.
+{{AXES_EVIDENCE_JSON}}

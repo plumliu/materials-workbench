@@ -1,110 +1,99 @@
+import copy
 import json
 from pathlib import Path
 
 import pymupdf
 import pytest
 
-from chart_annotator.domain.workflow import AxisStructure, DatasetStructure
 from chart_annotator.qwen import ModelReply
 from chart_annotator.runner import run_figure
 from chart_annotator.wpd import read
 
 
+def axes_arguments():
+    return {
+        "groups": [
+            {
+                "x": {"name": "Time", "scale": "linear"},
+                "ys": [{"name": "Stress", "scale": "linear"}],
+            }
+        ],
+        "unresolved": [],
+    }
+
+
+def grounding_arguments():
+    def anchor(value, x, y):
+        return {
+            "visible_label": str(value),
+            "value": value,
+            "point_2d": [1000 * x / 440, 1000 * y / 390],
+        }
+
+    return {
+        "groups": [
+            {
+                "x": [anchor(0, 73, 287), anchor(10, 167, 287), anchor(30, 367, 287)],
+                "ys": [[anchor(30, 73, 53), anchor(20, 73, 127), anchor(0, 73, 287)]],
+            }
+        ],
+        "unresolved": [],
+    }
+
+
+def dataset_arguments():
+    return {
+        "datasets": [
+            {
+                "axis": "axis_000_000",
+                "name": "Stress Annealed filled circle",
+                "kind": "scatter",
+            }
+        ],
+        "unresolved": [],
+    }
+
+
+def tool_reply(name, arguments, id_="call_1"):
+    return ModelReply(
+        None,
+        "fake",
+        0,
+        "tool_calls",
+        [
+            {
+                "id": id_,
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "arguments": arguments
+                    if isinstance(arguments, str)
+                    else json.dumps(arguments),
+                },
+            }
+        ],
+    )
+
+
 class FakeChartModel:
-    """Deterministic semantic answers for the synthetic chart; pixels from evidence."""
-
-    def __init__(self):
+    def __init__(self, transform=None):
         self.calls = []
+        self.transform = transform
 
-    def complete(self, messages):
-        prompt = messages[-1]["content"][0]["text"]
-        payload = json.loads(prompt[prompt.index('{"evidence":') :])
-        self.calls.append(payload)
-        title = payload["schema"]["title"]
-        if title == "AxisStructure":
-            result = {
-                "groups": [
-                    {
-                        "x": {"name": "Time", "scale": "linear"},
-                        "ys": [{"name": "Stress", "scale": "linear"}],
-                    }
-                ],
-            }
-            result = AxisStructure.model_validate(result).model_dump(mode="json")
-        elif title == "DatasetStructure":
-            result = DatasetStructure.model_validate(
-                {
-                    "datasets": [
-                        {
-                            "axis": "axis_000_000",
-                            "name": "Stress | filled circle",
-                            "kind": "scatter",
-                        }
-                    ]
-                }
-            ).model_dump(mode="json")
-        elif title == "VisualReview":
-            result = {
-                "axes": [
-                    {
-                        "axis_id": a["id"],
-                        "status": "consistent",
-                        "issues": [],
-                        "corrected_grounding": None,
-                    }
-                    for a in payload["structure"]["axes"]
-                ],
-                "unresolved": [],
-            }
+    def complete(self, messages, **kwargs):
+        call = copy.deepcopy({"messages": messages, **kwargs})
+        self.calls.append(call)
+        name = kwargs["tools"][0]["function"]["name"]
+        if name == "submit_grounding" and any(m["role"] == "tool" for m in messages):
+            reply = ModelReply('{"status":"confirmed"}', "fake", 0, "stop")
         else:
-            # Deliberately imprecise grounding, independent of local candidates.
-            def point(x, y):
-                return [1000 * x / 440, 1000 * y / 390]
-
-            result = {
-                "coordinate_system": "normalized_0_1000",
-                "groups": [
-                    {
-                        "x": [
-                            {
-                                "visible_label": "0",
-                                "value": 0,
-                                "point_2d": point(73, 287),
-                            },
-                            {
-                                "visible_label": "10",
-                                "value": 10,
-                                "point_2d": point(167, 287),
-                            },
-                            {
-                                "visible_label": "30",
-                                "value": 30,
-                                "point_2d": point(367, 287),
-                            },
-                        ],
-                        "ys": [
-                            [
-                                {
-                                    "visible_label": "30",
-                                    "value": 30,
-                                    "point_2d": point(73, 53),
-                                },
-                                {
-                                    "visible_label": "20",
-                                    "value": 20,
-                                    "point_2d": point(73, 127),
-                                },
-                                {
-                                    "visible_label": "0",
-                                    "value": 0,
-                                    "point_2d": point(73, 287),
-                                },
-                            ]
-                        ],
-                    }
-                ],
-            }
-        return ModelReply(json.dumps(result), "fake", 0, "stop")
+            arguments = {
+                "submit_axes": axes_arguments,
+                "submit_grounding": grounding_arguments,
+                "submit_datasets": dataset_arguments,
+            }[name]()
+            reply = tool_reply(name, arguments, f"call_{len(self.calls)}")
+        return self.transform(self, call, reply) if self.transform else reply
 
 
 def chart_pdf(path, figure_id="1.2"):
@@ -126,397 +115,154 @@ def chart_pdf(path, figure_id="1.2"):
         pdf.save(path)
 
 
-def test_real_local_evidence_fake_model_complete_graph(tmp_path):
+def run(tmp_path, model=None, datasets=False):
     source = tmp_path / "chart.pdf"
     chart_pdf(source)
+    return run_figure(
+        source, tmp_path / "out", model=model or FakeChartModel(), datasets=datasets
+    )
+
+
+def test_real_local_evidence_fake_model_complete_graph(tmp_path):
     model = FakeChartModel()
-    result = run_figure(source, tmp_path / "output", model=model)
+    result = run(tmp_path, model)
     assert result["status"] == "exported", result
-    assert result["datasets_enabled"] is False
-    assert len(model.calls) == 3
+    assert result["model_turns"] == {"axes": 1, "grounding": 2}
+    assert result["grounding_submissions"] == 1
     assert list(result["nodes"]) == [
         "prepare_figure",
         "plan_axes",
+        "validate_axes_submission",
         "ground_axes",
         "snap_and_fit",
-        "review_calibration",
+        "validate_grounding_completion",
         "export_and_validate",
     ]
-    assert set(model.calls[1]["evidence"]) == {"image_size", "numeric_text"}
-    assert "Grounding" == model.calls[1]["schema"]["title"]
+    assert len(model.calls) == 3
     tar = next(Path(p) for p in result["artifacts"] if p.endswith(".tar"))
     project, _ = read(tar)
-    assert len(project["axesColl"]) == 1
-    assert project["datasetColl"] == []
+    assert len(project["axesColl"]) == 1 and project["datasetColl"] == []
     assert len(project["axesColl"][0]["calibrationPoints"]) == 4
     assert result["checkpoint"] is None
-    assert not list((tmp_path / "output/checkpoints").glob("*.sqlite"))
 
 
-def test_dataset_planning_is_explicitly_enabled(tmp_path):
-    source = tmp_path / "chart.pdf"
-    chart_pdf(source)
-    model = FakeChartModel()
-    result = run_figure(source, tmp_path / "output", model=model, datasets=True)
+@pytest.mark.parametrize(
+    "axes_opinions,dataset_opinions",
+    [
+        ([], []),
+        (["Axis 标题待人工核对"], []),
+        (["Axis 标题待人工核对"], ["系列归属待人工核对。\n<保留模型原话>"]),
+    ],
+)
+def test_dataset_planning_is_explicitly_enabled(tmp_path, axes_opinions, dataset_opinions):
+    def transform(model, call, reply):
+        name = call["tools"][0]["function"]["name"]
+        if name == "submit_axes":
+            arguments = axes_arguments()
+            arguments["unresolved"] = axes_opinions
+            return tool_reply(name, arguments, f"call_{len(model.calls)}")
+        if name == "submit_datasets":
+            arguments = dataset_arguments()
+            arguments["unresolved"] = dataset_opinions
+            return tool_reply(name, arguments, f"call_{len(model.calls)}")
+        return reply
+
+    model = FakeChartModel(transform)
+    result = run(tmp_path, model, datasets=True)
     assert result["status"] == "exported", result
-    assert result["datasets_enabled"] is True
-    assert [call["schema"]["title"] for call in model.calls] == [
-        "AxisStructure",
-        "Grounding",
-        "VisualReview",
-        "DatasetStructure",
-    ]
-    dataset_call = model.calls[-1]
-    assert dataset_call["review_context"]["schema_version"] == "dataset-context/v1"
-    assert dataset_call["review_context"]["axes"][0]["alias"] == "A1"
-    assert dataset_call["review_context"]["axes"][0]["axis_id"] == "axis_000_000"
-    direction_colors = {
-        item["direction"]: item["color"]
-        for item in dataset_call["review_context"]["axes"][0]["directions"]
-    }
-    assert direction_colors["x"] != direction_colors["y"]
-    assert "grounding" not in dataset_call["review_context"]
-    assert dataset_call["axes"] == [
-        {
-            "id": "axis_000_000",
-            "name": "Time - Stress",
-            "x": {"name": "Time", "scale": "linear"},
-            "y": {"name": "Stress", "scale": "linear"},
-        }
-    ]
-    assert "structure" not in dataset_call
-    assert (
-        Path(result["run_dir"]) / "attempts/e0_s0/dataset-context/dataset_context.png"
-    ).exists()
-    project, _ = read(next(Path(p) for p in result["artifacts"] if p.endswith(".tar")))
-    assert [dataset["name"] for dataset in project["datasetColl"]] == [
-        "Stress | filled circle"
-    ]
-    # Replay all generated artifacts, including model records, context and TAR.
-    repeated = run_figure(source, tmp_path / "output", model=FakeChartModel(), datasets=True)
-    assert repeated["status"] == "exported", repeated
-    assert json.loads((Path(repeated["run_dir"]) / "audit/summary.json").read_text())["status"] == "exported"
-
-
-
-def test_model_failure_is_sanitized_and_never_exports(tmp_path):
-    import pytest
-    from PIL import Image
-
-    from chart_annotator.domain.workflow import Evidence, Geometry
-    from chart_annotator.semantic import request
-
-    class FailedModel:
-        def complete(self, messages):
-            raise RuntimeError("provider echoed a secret")
-
-    image = tmp_path / "blank.png"
-    Image.new("RGB", (100, 100)).save(image)
-    evidence = Evidence(
-        source_id="test",
-        geometry=Geometry(
-            image_size=(100, 100), preprocessing="test", spines=[], ticks=[]
-        ),
-        texts=[],
-    )
-    with pytest.raises(RuntimeError, match="Model request failed"):
-        request(FailedModel(), "axes", evidence, image, tmp_path / "model")
-    assert "secret" not in (tmp_path / "model/failure.json").read_text()
-
-    class RecoveredModel:
-        def complete(self, messages):
-            return ModelReply('{"groups":[],"unresolved":[]}', "fake", 1, "stop")
-
-    request(RecoveredModel(), "axes", evidence, image, tmp_path / "model")
-    assert not (tmp_path / "model/failure.json").exists()
-    assert (tmp_path / "model/response.json").exists()
-
-
-
-def test_resume_from_completed_node_boundary(tmp_path):
-    from langgraph.checkpoint.sqlite import SqliteSaver
-
-    from chart_annotator.graph import build_workflow
-
-    source = tmp_path / "resume.pdf"
-    chart_pdf(source)
-    database = tmp_path / "checkpoint.sqlite"
-    configuration = {"configurable": {"thread_id": "interrupted"}}
-    model = FakeChartModel()
-    with SqliteSaver.from_conn_string(str(database)) as saver:
-        workflow = build_workflow(model=model, checkpointer=saver)
-        list(
-            workflow.stream(
-                {
-                    "input_path": str(source),
-                    "output_dir": str(tmp_path / "runs"),
-                    "mode": "figure",
-                },
-                configuration,
-                interrupt_after=["prepare_figure"],
-            )
-        )
-        snapshot = workflow.get_state(configuration)
-        assert snapshot.next == ("plan_axes",)
-        image = Path(snapshot.values["rendered_figure"])
-        before = image.stat().st_mtime_ns
-    result = run_figure(None, tmp_path, database, "interrupted", model=model)
-    assert result["status"] == "exported", result
-    assert result["checkpoint"] is None
-    assert not database.exists()
-    assert image.stat().st_mtime_ns == before
-    assert len(model.calls) == 3
-
-
-def test_failed_axis_visual_review_relocates_grounding_then_revalidates(tmp_path):
-    class RepairModel(FakeChartModel):
-        def complete(self, messages):
-            reply = super().complete(messages)
-            if len(self.calls) == 2:
-                result = json.loads(reply.text)
-                for anchor in result["groups"][0]["x"]:
-                    anchor["point_2d"][1] = 500
-                return ModelReply(json.dumps(result), "fake", 0, "stop")
-            return reply
-
-    source = tmp_path / "repair.pdf"
-    chart_pdf(source)
-    model = RepairModel()
-    result = run_figure(source, tmp_path / "output", model=model)
-    assert result["status"] == "exported", result
+    opinions = [*axes_opinions, *dataset_opinions]
+    assert result["unresolved"] == opinions
+    run_dir = Path(result["run_dir"])
+    for path in ("plan/structure.json", "audit/summary.json"):
+        record = json.loads((run_dir / path).read_text(encoding="utf-8"))
+        assert record["unresolved"] == opinions
     assert len(model.calls) == 4
-    assert result["nodes"]["snap_and_fit"] == "completed"
-    assert model.calls[-2]["issues"]
-    assert model.calls[-2]["grounding"]["coordinate_system"] == "normalized_0_1000"
-    assert model.calls[-2]["review_context"]["mode"] == "failed_axes"
-    assert model.calls[-2]["review_context"]["failed_axis_ids"] == ["axis_000_000"]
-    assert model.calls[-2]["review_context"]["successful_fit_directions"] == [
-        {"axis_id": "axis_000_000", "direction": "y"}
-    ]
-    assert model.calls[-2]["evidence"] == {"image_size": [1320, 1170]}
-    directory = Path(result["run_dir"])
-    assert (directory / "attempts/e1_s0/failed_axis_review.png").exists()
-    assert (directory / "attempts/e1_s0_f1/calibration_review.png").exists()
-
-
-@pytest.mark.parametrize("repair_succeeds,expected_axes", [(True, 2), (False, 1)])
-def test_failed_axis_review_excludes_successful_sibling_axis(
-    tmp_path, repair_succeeds, expected_axes
-):
-    class TwoAxisFailureModel(FakeChartModel):
-        @staticmethod
-        def grounding(group, *, bad_second_y=False):
-            def point(x, y):
-                return [1000 * x / 440, 1000 * y / 390]
-
-            ys = []
-            for index, _ in enumerate(group["ys"]):
-                bad_x = (
-                    220
-                    if bad_second_y and (len(group["ys"]) == 1 or index == 1)
-                    else 73
-                )
-                ys.append(
-                    [
-                        {
-                            "visible_label": "30",
-                            "value": 30,
-                            "point_2d": point(bad_x, 53),
-                        },
-                        {
-                            "visible_label": "20",
-                            "value": 20,
-                            "point_2d": point(bad_x, 127),
-                        },
-                        {
-                            "visible_label": "0",
-                            "value": 0,
-                            "point_2d": point(bad_x, 287),
-                        },
-                    ]
-                )
-            return {
-                "coordinate_system": "normalized_0_1000",
-                "groups": [
-                    {
-                        "x": [
-                            {
-                                "visible_label": "0",
-                                "value": 0,
-                                "point_2d": point(73, 287),
-                            },
-                            {
-                                "visible_label": "10",
-                                "value": 10,
-                                "point_2d": point(167, 287),
-                            },
-                            {
-                                "visible_label": "30",
-                                "value": 30,
-                                "point_2d": point(367, 287),
-                            },
-                        ],
-                        "ys": ys,
-                    }
-                ],
-                "unresolved": [],
-            }
-
-        def complete(self, messages):
-            prompt = messages[-1]["content"][0]["text"]
-            payload = json.loads(prompt[prompt.index('{"evidence":') :])
-            if payload["schema"]["title"] == "AxisStructure":
-                self.calls.append(payload)
-                result = AxisStructure.model_validate(
-                    {
-                        "groups": [
-                            {
-                                "x": {"name": "Time", "scale": "linear"},
-                                "ys": [
-                                    {"name": "Stress", "scale": "linear"},
-                                    {"name": "Time", "scale": "linear"},
-                                ],
-                            }
-                        ]
-                    }
-                ).model_dump(mode="json")
-                return ModelReply(json.dumps(result), "fake", 0, "stop")
-            if payload["schema"]["title"] == "Grounding":
-                self.calls.append(payload)
-                failed_review = (
-                    payload.get("review_context", {}).get("mode") == "failed_axes"
-                )
-                result = self.grounding(
-                    payload["structure"]["groups"][0],
-                    bad_second_y=not (failed_review and repair_succeeds),
-                )
-                return ModelReply(json.dumps(result), "fake", 0, "stop")
-            return super().complete(messages)
-
-    source = tmp_path / "two-axis.pdf"
-    chart_pdf(source)
-    model = TwoAxisFailureModel()
-    result = run_figure(source, tmp_path / "output", model=model)
-    assert result["status"] == "exported", result
-    correction_call = next(
-        call
-        for call in model.calls
-        if call.get("review_context", {}).get("mode") == "failed_axes"
+    assert all(call["tool_choice"] == "auto" for call in model.calls)
+    assert model.calls[-1]["tools"][0]["function"]["name"] == "submit_datasets"
+    assert not any(
+        m["role"] in {"assistant", "tool"} for m in model.calls[-1]["messages"]
     )
-    assert len(correction_call["structure"]["groups"]) == 1
-    assert len(correction_call["structure"]["groups"][0]["ys"]) == 1
-    assert len(correction_call["grounding"]["groups"]) == 1
-    assert len(correction_call["grounding"]["groups"][0]["ys"]) == 1
-    assert correction_call["review_context"]["successful_fit_directions"] == [
-        {"axis_id": "axis_000_001", "direction": "x"}
-    ]
     project, _ = read(next(Path(p) for p in result["artifacts"] if p.endswith(".tar")))
-    assert len(project["axesColl"]) == expected_axes
-    assert "targeted_repair" not in result["nodes"]
-    if repair_succeeds:
-        assert not result.get("skipped_axes")
-    else:
-        assert result["skipped_axes"]
-        final_review = next(
-            call for call in model.calls if call["schema"]["title"] == "VisualReview"
-        )
-        assert [axis["id"] for axis in final_review["structure"]["axes"]] == [
-            "axis_000_000"
-        ]
+    assert project["datasetColl"][0]["name"] == "Stress Annealed filled circle"
 
 
-def test_global_fit_recovers_offset_anchor_without_retry(tmp_path):
-    class OffsetModel(FakeChartModel):
-        def complete(self, messages):
-            reply = super().complete(messages)
-            if len(self.calls) == 2:
-                output = json.loads(reply.text)
-                output["groups"][0]["x"][0]["point_2d"][0] += 50
-                return ModelReply(json.dumps(output), "fake", 0, "stop")
-            return reply
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "{not-json",
+        {
+            "groups": [
+                {
+                    "x": {"name": "Time", "scale": "categorical", "categories": ["A"]},
+                    "ys": [
+                        {"name": "Stress", "scale": "categorical", "categories": ["B"]}
+                    ],
+                }
+            ]
+        },
+        {"groups": [{"x": {"name": "Time", "scale": "INVALID"}, "ys": []}]},
+    ],
+)
+def test_invalid_axes_repairs_before_expanding(tmp_path, bad):
+    def transform(model, call, reply):
+        return tool_reply("submit_axes", bad) if len(model.calls) == 1 else reply
 
-    source = tmp_path / "chart.pdf"
-    chart_pdf(source)
-    model = OffsetModel()
-    result = run_figure(source, tmp_path / "output", model=model)
+    model = FakeChartModel(transform)
+    result = run(tmp_path, model)
     assert result["status"] == "exported", result
-    assert (
-        len(model.calls) == 3
-    )  # Local retry adds no call; final visual review is mandatory.
-    assert (
-        Path(result["run_dir"]) / "attempts/e0_s0/snap/local_bindings.json"
-    ).exists()
-    assert not (Path(result["run_dir"]) / "attempts/e1_s0").exists()
+    assert result["model_turns"]["axes"] == 2
+    first, second = model.calls[:2]
+    assert second["messages"][: len(first["messages"])] == first["messages"]
+    assert second["tools"] == first["tools"]
+    assert second["messages"][-1]["role"] == "tool"
+    assert json.loads(second["messages"][-1]["content"])["status"] == "needs_revision"
 
 
-def test_dataset_repair_revalidates_after_calibration_and_preserves_attempts(tmp_path):
-    class NamingRepairModel(FakeChartModel):
-        def complete(self, messages):
-            prompt = messages[-1]["content"][0]["text"]
-            payload = json.loads(prompt[prompt.index('{"evidence":') :])
-            if (
-                payload.get("issues")
-                and payload["issues"][0]["node"] == "validate_dataset_plan"
-            ):
-                self.calls.append(payload)
-                return self.correct
-            reply = super().complete(messages)
-            if payload["schema"]["title"] == "DatasetStructure":
-                self.correct = reply
-                bad = json.loads(reply.text)
+def test_axes_repair_does_not_spend_grounding_budget(tmp_path):
+    def transform(model, call, reply):
+        name = call["tools"][0]["function"]["name"]
+        count = sum(c["tools"][0]["function"]["name"] == name for c in model.calls)
+        if name == "submit_axes" and count == 1:
+            return tool_reply(name, "{")
+        if name == "submit_grounding" and count == 1:
+            bad = grounding_arguments()
+            for anchor in bad["groups"][0]["x"]:
+                anchor["point_2d"][1] = 500
+            return tool_reply(name, bad)
+        if name == "submit_grounding" and count == 2:
+            result = next(
+                json.loads(m["content"])
+                for m in reversed(call["messages"])
+                if m["role"] == "tool"
+            )
+            assert result["default_repair_directions"] == ["groups[0].x"]
+            return tool_reply(name, grounding_arguments())
+        return reply
+
+    model = FakeChartModel(transform)
+    result = run(tmp_path, model)
+    assert result["status"] == "exported", result
+    assert result["model_turns"] == {"axes": 2, "grounding": 3}
+    assert result["grounding_submissions"] == 2
+
+
+@pytest.mark.parametrize("repair", [True, False])
+def test_dataset_validation_repair_or_axes_only(tmp_path, repair):
+    def transform(model, call, reply):
+        if call["tools"][0]["function"]["name"] == "submit_datasets":
+            count = sum(
+                c["tools"][0]["function"]["name"] == "submit_datasets"
+                for c in model.calls
+            )
+            if not repair or count == 1:
+                bad = dataset_arguments()
                 bad["datasets"][0]["name"] = "Stress"
-                return ModelReply(json.dumps(bad), "fake", 0, "stop")
-            return reply
+                return tool_reply("submit_datasets", bad)
+        return reply
 
-    source = tmp_path / "repair.pdf"
-    chart_pdf(source)
-    model = NamingRepairModel()
-    result = run_figure(source, tmp_path / "output", model=model, datasets=True)
+    result = run(tmp_path, FakeChartModel(transform), datasets=True)
     assert result["status"] == "exported", result
-    assert len(model.calls) == 5
-    assert not model.calls[3].get("issues")
-    assert model.calls[4]["issues"][0]["code"] == "marker_name_incomplete"
-    report = model.calls[4]["validation_report"]
-    assert report["scope"] == "structural_checks_only"
-    assert report["target"] == "previous"
-    assert model.calls[4]["previous"]["datasets"][0]["name"] == "Stress"
-    assert "validation_report" not in model.calls[3]
-    failed = [c for c in report["checks"] if c["status"] == "failed"]
-    assert [(c["rule"], c["paths"]) for c in failed] == [
-        ("marker_name_incomplete", ["datasets[0].name"])
-    ]
-    assert any(
-        c["paths"] == ["datasets[0].axis"] and c["status"] == "passed"
-        for c in report["checks"]
-    )
-    directory = Path(result["run_dir"])
-    assert (directory / "attempts/e0_s0/dataset_validation.json").exists()
-    assert not (directory / "attempts/e0_s0_d1/dataset_validation.json").exists()
-
-
-def test_persistently_bad_dataset_naming_falls_back_to_axes_only(tmp_path):
-    class BadNamingModel(FakeChartModel):
-        def complete(self, messages):
-            prompt = messages[-1]["content"][0]["text"]
-            payload = json.loads(prompt[prompt.index('{"evidence":') :])
-            if payload.get("issues"):
-                self.calls.append(payload)
-                return self.bad
-            reply = super().complete(messages)
-            if payload["schema"]["title"] != "DatasetStructure":
-                return reply
-            bad = json.loads(reply.text)
-            bad["datasets"][0]["name"] = "Stress"
-            self.bad = ModelReply(json.dumps(bad), "fake", 0, "stop")
-            return self.bad
-
-    source = tmp_path / "bad.pdf"
-    chart_pdf(source)
-    model = BadNamingModel()
-    result = run_figure(source, tmp_path / "output", model=model, datasets=True)
-    assert result["status"] == "exported", result
-    assert len(model.calls) == 5
-    assert result["nodes"]["ground_axes"] == "completed"
-    assert result["skipped_datasets"]
+    assert result["model_turns"]["datasets"] == 2
     project, _ = read(next(Path(p) for p in result["artifacts"] if p.endswith(".tar")))
-    assert project["datasetColl"] == []
+    assert bool(project["datasetColl"]) == repair
+    assert bool(result["skipped_datasets"]) != repair

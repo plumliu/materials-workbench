@@ -20,6 +20,7 @@ def read_ticks(
     directory: Path,
     *,
     search_unlabelled=False,
+    grounded_range=None,
 ) -> TextEvidence:
     reader = RapidOCR()
     observations, raw = [], []
@@ -32,6 +33,18 @@ def read_ticks(
             ]
             ids = {i for t in related for i in t.text_observation_ids}
             boxes = [o.bbox_px for o in texts if o.id in ids and o.bbox_px]
+            glyph_height = (
+                max(b[3] - b[1] for b in boxes) if boxes else max(12, spine.width * 4)
+            )
+            if grounded_range is not None:
+                direction, low, high = grounded_range
+                pad = max(16, max(geometry.image_size) * 0.04)
+                coordinate = spine.coordinate
+                boxes = [
+                    (low, coordinate - pad, high, coordinate + pad)
+                    if direction == "x"
+                    else (coordinate - pad, low, coordinate + pad, high)
+                ]
             if not boxes:
                 if not search_unlabelled:
                     continue
@@ -41,9 +54,6 @@ def read_ticks(
                 a, b, c, d = spine.bbox
                 boxes = [(a - pad, b - pad, c + pad, d + pad)]
             # One strip per spine, not one model/engine initialization per tick.
-            glyph_height = (
-                max(b[3] - b[1] for b in boxes) if ids else max(12, spine.width * 4)
-            )
             x0 = max(0, int(min(b[0] for b in boxes) - glyph_height / 2))
             y0 = max(0, int(min(b[1] for b in boxes) - glyph_height / 2))
             x1 = min(source.width, int(max(b[2] for b in boxes) + glyph_height / 2 + 1))

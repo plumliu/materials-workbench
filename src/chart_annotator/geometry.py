@@ -140,6 +140,7 @@ def detect(image: Path, texts: list[TextObservation], alternative=False) -> Geom
                     id=f"tick_{len(ticks):04d}",
                     spine_id=spine.id,
                     intersection_px=point,
+                    provenance="tick_intersection",
                     text_observation_ids=[],
                     status="ocr_only",
                 )

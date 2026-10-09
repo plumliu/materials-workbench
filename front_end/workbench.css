@@ -20,3 +20,5 @@
 @keyframes recognition-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.recognition-spinner{animation:none}}
 dialog{max-width:560px;width:calc(100% - 40px);border:1px solid #c9d6dc;border-radius:12px;padding:28px;color:#203440;box-shadow:0 16px 60px #173b4a44}dialog::backdrop{background:#173b4a88}.dialog-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}dialog h2{font-size:22px}#editor-message{white-space:pre-wrap;max-height:150px;overflow:auto}
+.model-notes{background:#fff8e8;border-bottom:1px solid #ead8b2;padding:10px 16px;max-height:180px;overflow:auto;flex-shrink:0}
+.model-notes[hidden]{display:none}.model-notes summary{font-weight:600;color:#76501f}.model-notes p{font-size:12px;color:#697d88}.model-notes ul{margin:8px 0;padding-left:22px}.model-notes li{white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0}

@@ -144,6 +144,7 @@ class TickCandidate(Model):
     id: Identifier
     spine_id: Identifier
     intersection_px: Point
+    provenance: Literal["tick_intersection", "label_projection", "label_center"]
     text_observation_ids: list[str]
     status: ReconciliationStatus
 

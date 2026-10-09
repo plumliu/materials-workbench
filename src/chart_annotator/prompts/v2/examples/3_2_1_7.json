@@ -1,8 +1,7 @@
 {
   "figure_id": "3.2.1.7",
   "tasks": [
-    "axes",
-    "axes-repair"
+    "axes"
   ],
   "image": "fig_3_2_1_7.png",
   "source_ids": [

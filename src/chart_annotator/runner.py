@@ -10,6 +10,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 
 from chart_annotator.graph import build_workflow
 from chart_annotator.intake import write_json
+from chart_annotator.tool_workflow import PROTOCOL
 
 
 def run_figure(
@@ -25,7 +26,7 @@ def run_figure(
     thread_id = thread_id or uuid4().hex
     checkpoint = checkpoint or output.resolve() / "checkpoints" / f"{thread_id}.sqlite"
     checkpoint.parent.mkdir(parents=True, exist_ok=True)
-    config = {"configurable": {"thread_id": thread_id}}
+    config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 40}
     with closing(
         sqlite3.connect(str(checkpoint), check_same_thread=False)
     ) as connection:
@@ -44,6 +45,10 @@ def run_figure(
             raise ValueError("Existing thread: use resume or a new thread ID")
         if source is None and not previous.values:
             raise ValueError("No checkpoint exists for that thread")
+        if previous.values and previous.values.get("workflow_protocol") != PROTOCOL:
+            raise ValueError(
+                "Incompatible Figure checkpoint protocol; restart with the workbench retry flow"
+            )
         if source is None and not previous.next:
             result = previous.values
         else:
@@ -54,6 +59,7 @@ def run_figure(
                     "mode": "figure",
                     "datasets_enabled": datasets,
                     "source_context": source_context,
+                    "workflow_protocol": PROTOCOL,
                 }
                 if source is not None
                 else None,
@@ -68,6 +74,9 @@ def run_figure(
         "checkpoint": None if completed else str(checkpoint.resolve()),
         "thread_id": thread_id,
         "datasets_enabled": result.get("datasets_enabled", False),
+        "active_stage": result.get("active_stage"),
+        "model_turns": result.get("model_turns", {}),
+        "grounding_submissions": result.get("grounding_submissions", 0),
         "nodes": result.get("node_status", {}),
         "issues": [
             i.model_dump(mode="json") for i in result.get("validation_issues", [])
@@ -75,6 +84,9 @@ def run_figure(
         "artifacts": result.get("output_artifacts", []),
         "skipped_axes": result.get("skipped_axes"),
         "skipped_datasets": result.get("skipped_datasets"),
+        "unresolved": (
+            result.get("stage_data", {}).get("structure", {}).get("unresolved", [])
+        ),
     }
     if result.get("run_dir"):
         report = Path(result["run_dir"]) / "audit/summary.json"

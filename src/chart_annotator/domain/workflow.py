@@ -231,34 +231,25 @@ class GroundingResponse(Model):
     unresolved: list[str] = Field(default_factory=list)
 
 
-class AxisVisualReview(Model):
-    axis_id: str
-    status: Literal["consistent", "wrong", "unclear"]
-    issues: list[str]
-    corrected_grounding: AxisGrounding | None
+class GroundingSubmission(GroundingResponse):
+    recheck_directions: list[str] = Field(
+        default_factory=list,
+        description="Additional full direction addresses to correct beyond the latest default targets. "
+        "Use addresses from the initial list; submit groups in original order. Omit on initial submission.",
+    )
+
+
+class GroundingCompletion(Model):
+    status: Literal["confirmed", "unresolved"]
+    reason: str | None = None
 
     @model_validator(mode="after")
-    def check_verdict(self):
-        if self.status == "consistent":
-            if self.issues or self.corrected_grounding is not None:
-                raise ValueError("Consistent review must have no issues or correction")
-        elif not self.issues or any(not issue.strip() for issue in self.issues):
-            raise ValueError("Wrong/unclear review requires a concrete issue")
-        if self.status == "wrong":
-            if (
-                self.corrected_grounding is None
-                or self.corrected_grounding.axis_id != self.axis_id
-            ):
-                raise ValueError("Wrong review requires correction for the same Axis")
-        elif self.corrected_grounding is not None:
-            raise ValueError("Only wrong verdict may supply a correction")
+    def check_reason(self):
+        if self.status == "unresolved" and (not self.reason or not self.reason.strip()):
+            raise ValueError("unresolved requires a specific reason")
+        if self.status == "confirmed" and "reason" in self.model_fields_set:
+            raise ValueError("confirmed has no reason")
         return self
-
-
-class VisualReview(Model):
-    schema_version: Literal["visual-review/v1"] = "visual-review/v1"
-    axes: list[AxisVisualReview] = Field(min_length=1)
-    unresolved: list[str]
 
 
 class ResolvedPoint(Model):
@@ -272,6 +263,7 @@ class Fit(Model):
     axis_id: str
     direction: Literal["x", "y"]
     scale: Literal["linear", "log"]
+    calibration_method: Literal["tick_intersections", "anchored_label_spacing"]
     spine_id: str
     slope: float
     intercept: float

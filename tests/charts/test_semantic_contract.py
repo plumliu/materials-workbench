@@ -12,17 +12,14 @@ from chart_annotator.domain.workflow import (
     Geometry,
     Grounding,
     GroundingResponse,
-    Structure,
     TickGrounding,
 )
-from chart_annotator.qwen import ModelReply
 from chart_annotator.semantic import (
     AXIS_EXAMPLE_FILES,
     DATASET_EXAMPLE_FILES,
     PROMPTS,
-    dataset_example_output,
-    request,
     select_examples,
+    task_evidence,
     validate_axes,
     validate_datasets,
 )
@@ -130,56 +127,6 @@ def test_protocols_reject_legacy_panel_ids():
         )
 
 
-@pytest.mark.parametrize(
-    "task,expected_count",
-    [("axes", 5), ("axes-repair", 5), ("datasets", 2), ("datasets-repair", 2)],
-)
-def test_requests_use_bounded_multimodal_examples(tmp_path, task, expected_count):
-    example = load_example("3_2_1_7")
-    evidence = evidence_for(example)
-    image = PROMPTS / "examples" / example["image"]
-    axes = AxisStructure.model_validate(example["axis_output"])
-    datasets = DatasetStructure.model_validate(dataset_example_output(example))
-    structure = Structure(axes=axes.expand(), datasets=[])
-    expected = axes if task.startswith("axes") else datasets
-    if task.startswith("datasets"):
-        evidence.source_id = example["source_ids"][0]
-
-    class RecordingModel:
-        def complete(self, messages):
-            assert len(messages) == 2 * expected_count + 2
-            return ModelReply(expected.model_dump_json(), "fake", 0, "stop")
-
-    result = request(
-        RecordingModel(),
-        task,
-        evidence,
-        image,
-        tmp_path / task,
-        axes
-        if task == "axes-repair"
-        else structure
-        if task.startswith("datasets")
-        else None,
-    )
-    assert result == expected
-    snapshot = json.loads(
-        (tmp_path / task / "request.json").read_text(encoding="utf-8")
-    )
-    assert len(snapshot["example_files"]) == expected_count
-    assert "examples" not in snapshot
-    assert "image_sha256" not in snapshot
-    if task.startswith("axes"):
-        assert "fig_3_2_1_10.png" not in snapshot["example_files"]
-        assert tuple(snapshot["example_files"]) == tuple(
-            load_example(name.removesuffix(".json"))["image"]
-            for name in AXIS_EXAMPLE_FILES
-        )
-    if task.startswith("datasets"):
-        assert set(snapshot["payload"]) >= {"axes", "schema"}
-        assert "structure" not in snapshot["payload"]
-
-
 def test_dataset_protocol_is_minimal_and_expands_point_groups():
     schema = DatasetStructure.model_json_schema()
     assert set(schema["properties"]) == {"datasets", "unresolved"}
@@ -244,40 +191,6 @@ def test_dataset_validation_uses_only_axis_name_and_kind():
     assert {issue.code for issue in validate_datasets(bad, [axis], asset)} == {
         "marker_name_incomplete"
     }
-
-
-def test_binding_examples_keep_normalized_t_intersections(tmp_path):
-    example = load_example("3_2_1_1")
-    evidence = Evidence(
-        source_id=example["source_ids"][0],
-        geometry=Geometry(
-            image_size=(657, 941), preprocessing="test", spines=[], ticks=[]
-        ),
-        texts=[],
-    )
-    structure = AxisStructure.model_validate(example["binding_input"]["structure"])
-    expected = GroundingResponse.model_validate(example["binding_output"])
-
-    class RecordingModel:
-        def complete(self, messages):
-            references = [
-                GroundingResponse.model_validate_json(message["content"])
-                for message in messages
-                if message["role"] == "assistant"
-            ]
-            assert len(references) == 2
-            return ModelReply(expected.model_dump_json(), "fake", 0, "stop")
-
-    assert request(
-        RecordingModel(),
-        "binding",
-        evidence,
-        PROMPTS / "examples" / example["image"],
-        tmp_path,
-        structure,
-    ) == __import__(
-        "chart_annotator.semantic", fromlist=["expand_grounding"]
-    ).expand_grounding(expected, structure)
 
 
 def test_grounding_requires_two_to_four_anchors():
@@ -352,13 +265,9 @@ def test_axis_validation_rejects_unit_only_names():
 
 
 @pytest.mark.parametrize("method", ["source", "caption"])
-def test_same_figure_is_excluded_without_image_hash(tmp_path, method):
-    from PIL import Image
-
+def test_same_figure_is_excluded_without_image_hash(method):
     example = load_example("3_2_1_7")
     evidence = evidence_for(example)
-    image = tmp_path / "different.png"
-    Image.new("RGB", (80, 80)).save(image)
     if method == "source":
         evidence.source_id = example["source_ids"][0]
     else:
@@ -373,65 +282,38 @@ def test_same_figure_is_excluded_without_image_hash(tmp_path, method):
         )
     assert all(
         item["figure_id"] != "3.2.1.7"
-        for item in select_examples(evidence, image, task="datasets")
+        for item in select_examples(evidence, task="datasets")
     )
 
 
-def test_axis_repair_receives_scoped_passes_and_failures(tmp_path):
-    from chart_annotator.stages import plan_axes_node
+@pytest.mark.parametrize(
+    "task",
+    [
+        "binding",
+        "axes-repair",
+        "datasets-repair",
+        "repair",
+        "failed-axis-review",
+        "visual-review",
+        None,
+    ],
+)
+def test_prompt_helpers_reject_removed_tasks(task):
+    evidence = evidence_for(load_example("3_2_1_7"))
+    with pytest.raises(ValueError, match="Unknown model stage"):
+        task_evidence(task, evidence)
+    with pytest.raises(ValueError, match="Unknown model stage"):
+        select_examples(evidence, task=task)
 
-    example = load_example("3_2_1_10")
-    good = AxisStructure.model_validate(example["axis_output"])
-    bad = good.model_copy(deep=True)
-    bad.groups[0].ys[1].name = "ksi"
-    evidence = tmp_path / "evidence.json"
-    evidence.write_text(evidence_for(example).model_dump_json(), encoding="utf-8")
-    calls = []
 
-    class RepairModel:
-        def complete(self, messages):
-            prompt = messages[-1]["content"][0]["text"]
-            payload = json.loads(prompt[prompt.index('{"evidence":') :])
-            calls.append(payload)
-            if len(calls) == 1:
-                assert "validation_report" not in payload
-                return ModelReply(bad.model_dump_json(), "fake", 0, "stop")
-            report = payload["validation_report"]
-            assert report["scope"] == "structural_checks_only"
-            assert report["target"] == "structure"
-            assert payload["structure"] == bad.model_dump(mode="json")
-            failed = [c for c in report["checks"] if c["status"] == "failed"]
-            assert [(c["rule"], c["paths"]) for c in failed] == [
-                ("axis_name_quantity", ["groups[0].ys[1].name"])
-            ]
-            assert any(
-                c["paths"] == ["groups[0].x.name"] and c["status"] == "passed"
-                for c in report["checks"]
-            )
-            return ModelReply(good.model_dump_json(), "fake", 0, "stop")
-
-    result = plan_axes_node(RepairModel())(
-        {
-            "run_dir": str(tmp_path),
-            "axis_plan": "",
-            "evidence_graph": str(evidence),
-            "source_asset": SourceAsset(
-                source_id="test", path="chart.png", kind="image"
-            ),
-            "rendered_figure": str(PROMPTS / "examples" / example["image"]),
-        }
-    )
-    assert len(calls) == 2
-    assert result["status"] == "running"
-    assert all(
-        c["status"] == "passed" for c in result["structure_validation_report"]["checks"]
-    )
-    snapshot = json.loads(
-        (tmp_path / "attempts/e0_s0/model/axes-repair/request.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    assert snapshot["payload"]["validation_report"] == calls[1]["validation_report"]
+def test_grounding_curriculum_uses_only_current_stage_contract():
+    evidence = evidence_for(load_example("3_2_1_7"))
+    examples = select_examples(evidence, task="grounding")
+    assert {example["figure_id"] for example in examples} == {"3.2.1.1", "2.3.2.1"}
+    for example in examples:
+        assert "grounding_lesson" in example
+        assert "grounding_input" in example
+        GroundingResponse.model_validate(example["grounding_output"])
 
 
 def test_axis_report_scopes_duplicate_names_to_both_directions():

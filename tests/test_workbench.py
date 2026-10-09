@@ -407,6 +407,7 @@ def test_pdf_manual_annotation_and_parallel_figure_recognition(tmp_path, monkeyp
     release = {key: Event() for key in entered}
     empty = {"version": [4, 2], "axesColl": [], "datasetColl": [], "measurementColl": []}
     upload = tmp_path / "upload.tar"
+    opinions = ["范围系列的归属待人工核对。\n<script>保留模型原话</script>"]
 
     def fake_run(source, output, **options):
         ident = options["thread_id"]
@@ -416,7 +417,7 @@ def test_pdf_manual_annotation_and_parallel_figure_recognition(tmp_path, monkeyp
         if ident == second["id"]:
             return {"status": "failed", "issues": [{"message": "test provider failure"}]}
         write_archive(output / "output/chart.tar", empty, source)
-        return {"status": "exported"}
+        return {"status": "exported", "unresolved": opinions}
 
     monkeypatch.setattr("chart_annotator.runner.run_figure", fake_run)
     with service(tmp_path) as base:
@@ -471,9 +472,13 @@ def test_pdf_manual_annotation_and_parallel_figure_recognition(tmp_path, monkeyp
                 break
             time.sleep(.02)
         assert latest[first["id"]]["processing"]["status"] == "exported"
+        assert latest[first["id"]]["processing"]["unresolved"] == opinions
         assert latest[other["id"]]["processing"]["status"] == "failed"
         assert latest[other["id"]]["review_status"] == "unreviewed"
         assert read_tar(assets / other["id"] / (other["id"] + ".tar"))[0] == empty
         with pytest.raises(HTTPError):
             save(first, payload)  # before-reset revision can never restore old annotations
+        saved_first = save(latest[first["id"]], payload)
+        assert saved_first["processing"]["unresolved"] == opinions
+        assert infos()[first["id"]]["processing"]["unresolved"] == opinions
         assert save(latest[other["id"]], upload.read_bytes())["review_status"] == "draft"

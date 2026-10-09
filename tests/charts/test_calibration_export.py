@@ -63,6 +63,7 @@ def evidence_case(scale="linear", categorical=False):
                     id=tid,
                     spine_id="s" + direction,
                     intersection_px=point,
+                    provenance="tick_intersection",
                     text_observation_ids=[oid],
                     status="pdf_only",
                 )
@@ -330,6 +331,7 @@ def test_widest_real_ticks_replace_provisional_pair_and_exclude_projection():
 
     projected_id = "local_0_x_label_0"
     evidence.geometry.ticks[0].id = projected_id
+    evidence.geometry.ticks[0].provenance = "label_projection"
     bindings.axes[0].x.ticks[0].tick_id = projected_id
     bindings.axes[0].x.interval_px = (0, 500)
     calibrated, issues = fit_bindings(structure, bindings, evidence)

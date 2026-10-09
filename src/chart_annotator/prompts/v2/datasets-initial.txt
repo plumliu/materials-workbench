@@ -1,0 +1,5 @@
+CURRENT FIGURE. Identify visible collection objects on these accepted Axes and call submit_datasets.
+Accepted Axes:
+{{COMPACT_AXES_JSON}}
+Relevant evidence:
+{{DATASETS_EVIDENCE_JSON}}

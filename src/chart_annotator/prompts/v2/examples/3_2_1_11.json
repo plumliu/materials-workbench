@@ -1,8 +1,8 @@
 {
   "figure_id": "3.2.1.11",
   "tasks": [
-    "datasets",
-    "datasets-repair"
+    "axes",
+    "datasets"
   ],
   "image": "dataset_3_2_1_11.png",
   "source_ids": [
@@ -159,5 +159,5 @@
     ],
     "unresolved": []
   },
-  "axis_lesson": "One shared linear Aging Temperature (F) X. Four separate linear Y mappings are printed for Ftu, Fty, RA, and e(1 in); error bars and curves do not change the Axis structure."
+  "axis_lesson": "One shared linear Aging Temperature (F) X and four independent linear Ys: Ftu (upper left), Fty (upper right), RA (lower left), and e(1 in) (lower right). At the same height, left Ftu=170 corresponds to right Fty=180, and left RA=0 corresponds to right e=10. These same-unit pairs have different origins and must stay separate. In contrast, RA/e can share one Y in other figures when their printed mappings coincide; decide from this image's ticks, not the property names. Error bars and curves do not change the Axis structure."
 }

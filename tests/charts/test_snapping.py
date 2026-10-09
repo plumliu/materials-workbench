@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from PIL import Image, ImageDraw
-from test_workflow_e2e import FakeChartModel, chart_pdf
+from test_workflow_e2e import chart_pdf, grounding_arguments
 
 from chart_annotator.calibration import fit_bindings
 from chart_annotator.domain.models import AxisPlan, DatasetPlan, TickCandidate
@@ -49,27 +49,7 @@ def synthetic(tmp_path):
             DatasetPlan(id="d", axis_id="a", display_name="Stress", kind="scatter")
         ],
     )
-    model = FakeChartModel()
-    reply = model.complete(
-        [
-            {
-                "content": [
-                    {
-                        "text": json.dumps(
-                            {
-                                "evidence": {},
-                                "structure": structure.model_dump(),
-                                "schema": Grounding.model_json_schema(),
-                            }
-                        )
-                    }
-                ]
-            }
-        ]
-    )
-    grounding = expand_grounding(
-        GroundingResponse.model_validate_json(reply.text), structure
-    )
+    grounding = expand_grounding(GroundingResponse.model_validate(grounding_arguments()), structure)
     return image, evidence, structure, grounding
 
 
@@ -101,6 +81,7 @@ def test_fragmented_local_axis_spine_is_merged_before_selection():
                 id=f"t{i}",
                 spine_id=f"s{i}",
                 intersection_px=(31, 100 + i * 150),
+                provenance="tick_intersection",
                 text_observation_ids=[],
                 status="ocr_only",
             )

@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 
 from chart_annotator import geometry, tick_ocr
-from chart_annotator.calibration import outside_spine
+from chart_annotator.calibration import _label_spacing_mapping, outside_spine
 from chart_annotator.domain.models import (
     TextObservation,
     TickCandidate,
@@ -20,6 +20,7 @@ from chart_annotator.domain.workflow import (
     Evidence,
     Geometry,
     Grounding,
+    ResolvedPoint,
     Structure,
     TickSelection,
 )
@@ -226,12 +227,245 @@ def _project_labels_from_mapping(
             id=f"{prefix}_label_{len(projected)}",
             spine_id=spine.id,
             intersection_px=point,
+            provenance="label_projection",
             text_observation_ids=[text.id],
             status=("pdf_only" if text.source == "pdf_text_layer" else "ocr_only"),
         )
         projected.append((tick, anchor, hinted_pixel, text.id))
         selected_values.add(anchor.value)
     return projected
+
+
+def _label_spacing_selection(
+    anchored,
+    ticks,
+    texts,
+    direction,
+    spine,
+    radius,
+    prefix,
+    *,
+    scale="linear",
+    rejections=None,
+):
+    """Select one real station and same-column raw labels; fitting stays in calibration."""
+    along = 0 if direction == "x" else 1
+    tolerance = max(2.0, 2 * spine.width)
+    valid = [(a, p) for a, p in anchored if numeric_value(a.visible_label) == a.value]
+    if len({a.value for a, _ in valid}) < 2:
+        return None
+    sources = sorted(
+        {t.source for t in texts}, key=lambda s: (s != "pdf_text_layer", s)
+    )
+    failures = []
+    for source in sources:
+        choices = []
+        for side in (0, 1):
+            pool = [
+                t
+                for t in texts
+                if t.source == source
+                and t.numeric_value is not None
+                and t.bbox_px
+                and outside_spine(t, direction, spine.coordinate, side)
+                and _interval_distance(
+                    spine.coordinate,
+                    (t.bbox_px[1], t.bbox_px[3])
+                    if direction == "x"
+                    else (t.bbox_px[0], t.bbox_px[2]),
+                )
+                <= radius
+                and _text_axis_interval(t, direction)[1]
+                >= min(p[along] for _, p in valid) - radius
+                and _text_axis_interval(t, direction)[0]
+                <= max(p[along] for _, p in valid) + radius
+            ]
+            # A column has a common across-axis interval; separate columns cannot vote together.
+            columns = []
+            for text in sorted(pool, key=lambda t: t.bbox_px[1 - along]):
+                box = text.bbox_px
+                interval = (box[1 - along], box[3 - along])
+                matching = [
+                    c
+                    for c in columns
+                    if max(c[0], interval[0]) <= min(c[1], interval[1])
+                ]
+                if len(matching) > 1:
+                    raise ValueError("Competing label columns near grounding")
+                if matching:
+                    column = matching[0]
+                    column[0], column[1] = (
+                        max(column[0], interval[0]),
+                        min(column[1], interval[1]),
+                    )
+                    column[2].append(text)
+                else:
+                    columns.append([*interval, [text]])
+            for _, _, column in columns:
+                # Equivalent overlapping readings from one source are one physical label.
+                unique = []
+                for text in sorted(column, key=lambda t: t.id):
+                    if not any(
+                        t.numeric_value == text.numeric_value
+                        and max(
+                            _text_axis_interval(t, direction)[0],
+                            _text_axis_interval(text, direction)[0],
+                        )
+                        <= min(
+                            _text_axis_interval(t, direction)[1],
+                            _text_axis_interval(text, direction)[1],
+                        )
+                        for t in unique
+                    ):
+                        unique.append(text)
+                claimed = []
+                ambiguous = False
+                for anchor, pixel in valid:
+                    matches = [
+                        t
+                        for t in unique
+                        if t.numeric_value == anchor.value
+                        and _interval_distance(
+                            pixel[along], _text_axis_interval(t, direction)
+                        )
+                        <= radius
+                    ]
+                    if len(matches) > 1:
+                        ambiguous = True
+                    elif matches:
+                        claimed.append((anchor, pixel, matches[0]))
+                if len({t.id for _, _, t in claimed}) < 2:
+                    continue
+                if ambiguous:
+                    raise ValueError("A grounded value has competing label positions")
+                centers = [
+                    sum(_text_axis_interval(t, direction)) / 2 for _, _, t in claimed
+                ]
+                low, high = min(centers), max(centers)
+                labels = [
+                    t
+                    for t in unique
+                    if low - tolerance
+                    <= sum(_text_axis_interval(t, direction)) / 2
+                    <= high + tolerance
+                ]
+                if len({t.numeric_value for t in labels}) != len(labels):
+                    raise ValueError(
+                        "Repeated numeric values at different label positions"
+                    )
+                real = []
+                for tick in ticks:
+                    matches = [
+                        t
+                        for t in labels
+                        if _interval_distance(
+                            tick.intersection_px[along],
+                            _text_axis_interval(t, direction),
+                        )
+                        <= tolerance
+                    ]
+                    if len(matches) > 1:
+                        raise ValueError(
+                            "A real intersection has competing visible values"
+                        )
+                    if matches:
+                        real.append((tick, matches[0]))
+                if len(real) > 1:
+                    return None  # Real stations must use the original path, including its conflicts.
+                if not real:
+                    continue
+                tick, text = real[0]
+                if not any(
+                    t.id == text.id and math.dist(pixel, tick.intersection_px) <= radius
+                    for _, pixel, t in claimed
+                ):
+                    continue
+                choices.append((labels, claimed, tick, text))
+        if len(choices) > 1:
+            raise ValueError("Competing sides or columns for label spacing")
+        if choices:
+            labels, claimed, real_tick, real_text = choices[0]
+            centers = [
+                sum(_text_axis_interval(t, direction)) / 2 for _, _, t in claimed
+            ]
+            low, high = min(centers), max(centers)
+            pairs = [(real_tick, real_text)]
+            for text in labels:
+                if text.id == real_text.id:
+                    continue
+                center = sum(_text_axis_interval(text, direction)) / 2
+                point = (
+                    (center, spine.coordinate)
+                    if direction == "x"
+                    else (spine.coordinate, center)
+                )
+                pairs.append(
+                    (
+                        TickCandidate(
+                            id=f"{prefix}_center_{len(pairs)}",
+                            spine_id=spine.id,
+                            intersection_px=point,
+                            provenance="label_center",
+                            text_observation_ids=[text.id],
+                            status="pdf_only"
+                            if source == "pdf_text_layer"
+                            else "ocr_only",
+                        ),
+                        text,
+                    )
+                )
+            by_text = {text.id: tick for tick, text in pairs}
+            selection = DirectionBinding(
+                spine_id=spine.id,
+                ticks=[
+                    TickSelection(tick_id=tick.id, text_id=text.id)
+                    for tick, text in pairs
+                ],
+                calibration_tick_ids=(
+                    real_tick.id,
+                    max(
+                        pairs[1:],
+                        key=lambda p: abs(
+                            p[0].intersection_px[along]
+                            - real_tick.intersection_px[along]
+                        ),
+                    )[0].id,
+                ),
+                grounded_tick_ids=[by_text[t.id].id for _, _, t in claimed],
+                interval_px=(low, high),
+            )
+            try:
+                # Source checks share the fitter without replacing raw evidence with predicted pixels.
+                _label_spacing_mapping(
+                    direction,
+                    scale,
+                    selection,
+                    [
+                        ResolvedPoint(
+                            tick_id=t.id,
+                            text_id=text.id,
+                            pixel=t.intersection_px,
+                            value=text.numeric_value,
+                        )
+                        for t, text in pairs
+                    ],
+                    {t.id: t for t, _ in pairs},
+                    {text.id: text for _, text in pairs},
+                    spine,
+                )
+            except ValueError as error:
+                failure = {"source": source, "reason": str(error)}
+                failures.append(failure)
+                if rejections is not None:
+                    rejections.append(failure)
+                continue
+            return selection, pairs, claimed
+    if failures:
+        raise ValueError(
+            "No text source supports label spacing: "
+            + "; ".join(f"{f['source']}: {f['reason']}" for f in failures)
+        )
+    return None
 
 
 def snap_grounding(
@@ -246,7 +480,7 @@ def snap_grounding(
     """Re-detect near every hint even when the global catalog missed the true T."""
     result = evidence.model_copy(deep=True)
     bindings = Bindings(axes=[])
-    issues, events = [], []
+    issues, events, label_source_rejections = [], [], []
 
     def problem(code, message, ids, repair="semantic"):
         issues.append(
@@ -343,8 +577,8 @@ def snap_grounding(
                                         "crop_bbox": None,
                                         "reused_from_axis_id": axis.shared_x_axis_id,
                                         "method": (
-                                            "label_projection"
-                                            if "_label_" in tick.id
+                                            tick.provenance
+                                            if tick.provenance != "tick_intersection"
                                             else "shared_axis_reuse"
                                         ),
                                     }
@@ -448,6 +682,15 @@ def snap_grounding(
                     ticks=ticks,
                 )
                 geometry.associate(found, result.texts)
+                known_texts = {t.id: t for t in result.texts}
+                supported_ticks = [
+                    t
+                    for t in ticks
+                    if any(
+                        known_texts[i].numeric_value in {a.value for a, _ in anchored}
+                        for i in t.text_observation_ids
+                    )
+                ]
                 ocr = tick_ocr.read_ticks(
                     image,
                     found,
@@ -455,6 +698,9 @@ def snap_grounding(
                     evidence.source_id,
                     directory / prefix,
                     search_unlabelled=True,
+                    grounded_range=(direction, low, high)
+                    if len(supported_ticks) < 2
+                    else None,
                 )
                 for i, text in enumerate(ocr.observations):
                     text.id = f"{prefix}_ocr_{i}"
@@ -501,10 +747,64 @@ def snap_grounding(
                     for tick in ticks
                     if low - radius <= tick.intersection_px[along] <= high + radius
                 ]
+
+                def try_label_spacing():
+                    rejected = []
+                    try:
+                        selected = _label_spacing_selection(
+                            anchored,
+                            candidate_ticks,
+                            result.texts,
+                            direction,
+                            spine,
+                            radius,
+                            prefix,
+                            scale=scale,
+                            rejections=rejected,
+                        )
+                    except ValueError as error:
+                        problem("label_spacing_ambiguous", str(error), [axis.id])
+                        return True
+                    finally:
+                        label_source_rejections.extend(
+                            {"axis_id": axis.id, "direction": direction, **r}
+                            for r in rejected
+                        )
+                    if selected is None:
+                        return False
+                    selection, pairs, claimed = selected
+                    setattr(binding, direction, selection)
+                    for tick, text in pairs:
+                        if tick.provenance == "label_center":
+                            result.geometry.ticks.append(tick)
+                        elif text.id not in tick.text_observation_ids:
+                            tick.text_observation_ids.append(text.id)
+                    by_text = {text.id: tick for tick, text in pairs}
+                    for anchor, pixel, text in claimed:
+                        tick = by_text[text.id]
+                        events.append(
+                            {
+                                "axis_id": axis.id,
+                                "direction": direction,
+                                "visible_label": anchor.visible_label,
+                                "value": anchor.value,
+                                "normalized_hint": anchor.point_2d,
+                                "hint_px": pixel,
+                                "snapped_px": tick.intersection_px,
+                                "tick_id": tick.id,
+                                "text_id": text.id,
+                                "crop_bbox": (x0, y0, x1, y1),
+                                "method": tick.provenance,
+                            }
+                        )
+                    return True
+
                 if len(candidate_ticks) < 2:
+                    if try_label_spacing():
+                        continue
                     problem(
                         "local_ticks_missing",
-                        "Need at least two local T intersections in the grounded range",
+                        "Need two real intersections, or one real intersection with two same-layout numeric labels",
                         [axis.id],
                         "semantic" if alternative else "evidence",
                     )
@@ -675,9 +975,11 @@ def snap_grounding(
                     min(hypotheses, key=lambda item: item[:4]) if hypotheses else None
                 )
                 if best is None or -best[0] < 2:
+                    if try_label_spacing():
+                        continue
                     problem(
                         "insufficient_snapped_ticks",
-                        "Need two distinct ink-supported anchors with matching visible values",
+                        "Need two matched real anchors, or one matched real anchor with two same-layout numeric labels",
                         [axis.id],
                         "evidence",
                     )
@@ -841,6 +1143,7 @@ def snap_grounding(
             "coordinate_system": "normalized_0_1000",
             "image_size": result.geometry.image_size,
             "events": events,
+            "label_source_rejections": label_source_rejections,
         },
     )
     write_json(directory / "local_evidence.json", result.model_dump(mode="json"))
